@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             App_SudokuTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "Soon",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
