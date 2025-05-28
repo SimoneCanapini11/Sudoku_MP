@@ -241,10 +241,11 @@ fun NumberKeyboard(
                 }
                 Button(
                     onClick = onClearClick,
-                    modifier = Modifier.size(48.dp),
-                    shape = RoundedCornerShape(8.dp)
+                    modifier = Modifier.size(50.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(0.dp)
                 ) {
-                    Text("X", fontSize = 16.sp)
+                    Text("X", fontSize = 18.sp)
                 }
             }
         }
@@ -258,8 +259,9 @@ fun NumberButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier.size(48.dp),
-        shape = RoundedCornerShape(8.dp)
+        modifier = Modifier.size(50.dp),
+        shape = RoundedCornerShape(8.dp),
+        contentPadding = PaddingValues(0.dp)
     ) {
         Text(
             text = number.toString(),
