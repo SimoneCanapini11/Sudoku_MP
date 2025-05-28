@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.canapini_grasselli.app_sudoku.ui.theme.App_SudokuTheme
+import com.canapini_grasselli.app_sudoku.views.SudokuScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
