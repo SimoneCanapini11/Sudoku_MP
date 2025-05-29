@@ -261,7 +261,7 @@ fun NumberButton(
         onClick = onClick,
         modifier = Modifier.size(50.dp),
         shape = RoundedCornerShape(8.dp),
-        contentPadding = PaddingValues(0.dp) //numero centrato
+        contentPadding = PaddingValues(0.dp) //padding per centrare il numero
     ) {
         Text(
             text = number.toString(),
