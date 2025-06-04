@@ -1,5 +1,6 @@
 package com.canapini_grasselli.app_sudoku.model
 
+
 data class SudokuCell(
     val value: Int = 0,
     val isFixed: Boolean = false,
@@ -11,5 +12,19 @@ data class SudokuGame(
     val selectedRow: Int = -1,
     val selectedCol: Int = -1,
     val isCompleted: Boolean = false,
-    val mistakes: Int = 0
+    val mistakes: Int = 0,
+    val difficulty: String = ""
 )
+
+data class SudokuAPIResponse(
+    val newboard: NewBoard
+) {
+    data class NewBoard(
+        val grids: List<Grid>
+    )
+    data class Grid(
+        val value: List<List<Int>>,
+        val solution: List<List<Int>>,
+        val difficulty: String
+    )
+}

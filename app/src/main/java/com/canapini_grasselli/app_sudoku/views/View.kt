@@ -1,5 +1,6 @@
 package com.canapini_grasselli.app_sudoku.views
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,7 +15,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,7 +35,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp), // padding top aumentato
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Header con statistiche
@@ -50,6 +53,12 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                     text = "Errori: ${gameState.mistakes}",
                     style = MaterialTheme.typography.titleMedium
                 )
+
+                Text(
+                    text = "Difficoltà: ${gameState.difficulty.capitalize()}",
+                    // ...altri parametri
+                )
+
                 if (gameState.isCompleted) {
                     Text(
                         text = "🎉 COMPLETATO! 🎉",
@@ -170,30 +179,35 @@ fun SudokuCell(
     modifier: Modifier = Modifier
 ) {
     val backgroundColor = when {
-        isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-        isInSameRow || isInSameCol || isInSameBox -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-        else -> Color.Transparent
+        isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+        isInSameRow || isInSameCol || isInSameBox -> MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
+        cell.isFixed -> MaterialTheme.colorScheme.surfaceVariant
+        else -> MaterialTheme.colorScheme.surface
     }
 
     val textColor = when {
         !cell.isValid -> Color.Red
-        cell.isFixed -> Color.Black
-        else -> MaterialTheme.colorScheme.primary
+        cell.isFixed -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.onSurface
     }
+
 
     Box(
         modifier = modifier
             .aspectRatio(1f)
             .background(backgroundColor)
-            .border(0.5.dp, Color.Gray)
+            .border(
+                width = if (isSelected) 2.dp else 0.5.dp,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray
+            )
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         if (cell.value != 0) {
             Text(
                 text = cell.value.toString(),
-                fontSize = 20.sp,
-                fontWeight = if (cell.isFixed) FontWeight.Bold else FontWeight.Normal,
+                fontSize = 24.sp,
+                fontWeight = if (cell.isFixed) FontWeight.Bold else FontWeight.Medium,
                 color = textColor,
                 textAlign = TextAlign.Center
             )

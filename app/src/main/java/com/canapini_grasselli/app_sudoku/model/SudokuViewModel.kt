@@ -1,5 +1,6 @@
 package com.canapini_grasselli.app_sudoku.model
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,89 +64,41 @@ class SudokuViewModel : ViewModel() {
 
     fun generateNewGame() {
         viewModelScope.launch {
-            val newGrid = generateSudokuPuzzle()
-            _gameState.value = SudokuGame(
-                grid = newGrid,
-                selectedRow = -1,
-                selectedCol = -1,
-                isCompleted = false,
-                mistakes = 0
-            )
-        }
-    }
+            try {
+                val response = SudokuApiClient.service.getSudoku()
+                val apiGrid = response.newboard.grids.first()
+                val values = apiGrid.value
+                val difficulty = apiGrid.difficulty
 
-    private fun generateSudokuPuzzle(): List<List<SudokuCell>> {
-        // Genera una griglia completa e valida
-        val completeGrid = generateCompleteGrid()
-
-        // Rimuove alcuni numeri per creare il puzzle
-        val puzzle = completeGrid.map { row ->
-            row.map { cell ->
-                if (Random.nextFloat() < 0.6) { // 60% di possibilità di rimuovere
-                    SudokuCell(value = 0, isFixed = false)
-                } else {
-                    SudokuCell(value = cell.value, isFixed = true)
-                }
-            }
-        }
-
-        return puzzle
-    }
-
-    private fun generateCompleteGrid(): List<List<SudokuCell>> {
-        val grid = Array(9) { Array(9) { 0 } }
-        fillGrid(grid)
-
-        return grid.map { row ->
-            row.map { value ->
-                SudokuCell(value = value, isFixed = true)
-            }
-        }
-    }
-
-    private fun fillGrid(grid: Array<Array<Int>>): Boolean {
-        for (row in 0..8) {
-            for (col in 0..8) {
-                if (grid[row][col] == 0) {
-                    val numbers = (1..9).shuffled()
-                    for (num in numbers) {
-                        if (isValidPlacement(grid, row, col, num)) {
-                            grid[row][col] = num
-                            if (fillGrid(grid)) {
-                                return true
-                            }
-                            grid[row][col] = 0
-                        }
+                // Trasforma la griglia dell’API nel modello di dati
+                val newGrid = values.map { row ->
+                    row.map { value ->
+                        SudokuCell(
+                            value = if (value == 0) 0 else value,
+                            isFixed = value != 0
+                        )
                     }
-                    return false
                 }
+
+                _gameState.value = SudokuGame(
+                    grid = newGrid,
+                    selectedRow = -1,
+                    selectedCol = -1,
+                    isCompleted = false,
+                    mistakes = 0,
+                    difficulty = difficulty
+                )
+            } catch (e: Exception) {
+                // Stampa il tipo di eccezione e il messaggio nel logcat
+                Log.e("SudokuViewModel", "Errore generazione sudoku", e)
+                // oppure, se vuoi solo il messaggio:
+                Log.e("SudokuViewModel", "Errore: ${e.javaClass.simpleName}: ${e.message}")
+                // oppure stampa direttamente lo stacktrace:
+                e.printStackTrace()
             }
         }
-        return true
     }
 
-    private fun isValidPlacement(grid: Array<Array<Int>>, row: Int, col: Int, num: Int): Boolean {
-        // Controllo riga
-        for (c in 0..8) {
-            if (grid[row][c] == num) return false
-        }
-
-        // Controllo colonna
-        for (r in 0..8) {
-            if (grid[r][col] == num) return false
-        }
-
-        // Controllo box 3x3
-        val boxRow = (row / 3) * 3
-        val boxCol = (col / 3) * 3
-        for (r in boxRow until boxRow + 3) {
-            for (c in boxCol until boxCol + 3) {
-                if (grid[r][c] == num) return false
-            }
-        }
-
-        return true
-    }
 
     private fun isValidMove(grid: List<List<SudokuCell>>, row: Int, col: Int, num: Int): Boolean {
         if (num == 0) return true
@@ -172,7 +125,7 @@ class SudokuViewModel : ViewModel() {
         return true
     }
 
-    private fun checkIfCompleted(grid: List<List<SudokuCell>>): Boolean {
+    private fun checkIfCompleted(grid: List<List<SudokuCell>>): Boolean {   //-------da fare con API (solution)
         for (row in 0..8) {
             for (col in 0..8) {
                 val cell = grid[row][col]
