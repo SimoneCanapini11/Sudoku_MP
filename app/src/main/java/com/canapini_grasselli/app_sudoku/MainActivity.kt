@@ -34,3 +34,5 @@ class MainActivity : ComponentActivity() {
 
 //Cambiare i font
 //Mettere la localizzazione
+//landscape
+//mantieni stato partita in background
