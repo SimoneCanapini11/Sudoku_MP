@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class SudokuViewModel : ViewModel() {
     private val _gameState = MutableStateFlow(SudokuGame())
@@ -68,9 +67,10 @@ class SudokuViewModel : ViewModel() {
                 val response = SudokuApiClient.service.getSudoku()
                 val apiGrid = response.newboard.grids.first()
                 val values = apiGrid.value
+                val solution = apiGrid.solution
                 val difficulty = apiGrid.difficulty
 
-                // Trasforma la griglia dell’API nel modello di dati
+                // Trasforma la griglia dell’API nel modello di dati SudokuCell
                 val newGrid = values.map { row ->
                     row.map { value ->
                         SudokuCell(
@@ -86,7 +86,8 @@ class SudokuViewModel : ViewModel() {
                     selectedCol = -1,
                     isCompleted = false,
                     mistakes = 0,
-                    difficulty = difficulty
+                    difficulty = difficulty,
+                    solution = solution
                 )
             } catch (e: Exception) {
                 // Stampa il tipo di eccezione e il messaggio nel logcat
@@ -125,7 +126,7 @@ class SudokuViewModel : ViewModel() {
         return true
     }
 
-    private fun checkIfCompleted(grid: List<List<SudokuCell>>): Boolean {   //-------da fare con API (solution)
+    private fun checkIfCompleted(grid: List<List<SudokuCell>>): Boolean {
         for (row in 0..8) {
             for (col in 0..8) {
                 val cell = grid[row][col]
@@ -134,4 +135,90 @@ class SudokuViewModel : ViewModel() {
         }
         return true
     }
+
+    fun generateHint() {
+        val currentState = _gameState.value
+        val row = currentState.selectedRow
+        val col = currentState.selectedCol
+        val solution = currentState.solution ?: return // Se la soluzione non c'è, esci
+
+        if (row == -1 || col == -1) return
+        if (currentState.grid[row][col].isFixed) return
+
+        val correctNumber = solution[row][col]
+        setHint(correctNumber) // Usa una diversa logica dell'inserimento per suggerire un numero
+    }
+
+    fun setHint(number: Int) {
+        val currentState = _gameState.value
+        val row = currentState.selectedRow
+        val col = currentState.selectedCol
+
+        if (row == -1 || col == -1) return
+        if (currentState.grid[row][col].isFixed) return
+
+        // Aggiorna il valore nella cella selezionata
+        val tempGrid = currentState.grid.mapIndexed { r, rowList ->
+            rowList.mapIndexed { c, cell ->
+                if (r == row && c == col) {
+                    cell.copy(value = number, isValid = true)
+                } else {
+                    cell
+                }
+            }
+        }
+
+        // Trova celle con lo stesso numero nella stessa riga, colonna e box 3x3 (esclude la cella suggerita)
+        val conflictingCells = mutableListOf<Pair<Int, Int>>()
+
+        // Riga
+        for (c in 0 until 9) {
+            if (c != col && tempGrid[row][c].value == number && !tempGrid[row][c].isFixed) {
+                conflictingCells.add(Pair(row, c))
+            }
+        }
+        // Colonna
+        for (r in 0 until 9) {
+            if (r != row && tempGrid[r][col].value == number && !tempGrid[r][col].isFixed) {
+                conflictingCells.add(Pair(r, col))
+            }
+        }
+        // Box 3x3
+        val startRow = (row / 3) * 3
+        val startCol = (col / 3) * 3
+        for (r in startRow until startRow + 3) {
+            for (c in startCol until startCol + 3) {
+                if ((r != row || c != col) &&
+                    tempGrid[r][c].value == number &&
+                    !tempGrid[r][c].isFixed
+                ) {
+                    conflictingCells.add(Pair(r, c))
+                }
+            }
+        }
+
+        // Aggiorna le celle in conflitto per diventare rosse
+        val newGrid = tempGrid.mapIndexed { r, rowList ->
+            rowList.mapIndexed { c, cell ->
+                if (conflictingCells.contains(Pair(r, c))) {
+                    cell.copy(isValid = false)
+                } else if (cell.isValid == false) {
+                    cell.copy(isValid = false)
+                } else {
+                    cell
+                }
+            }
+        }
+
+        val newMistakes = currentState.mistakes + conflictingCells.size
+
+        val isCompleted = checkIfCompleted(newGrid)
+
+        _gameState.value = currentState.copy(
+            grid = newGrid,
+            mistakes = newMistakes,
+            isCompleted = isCompleted
+        )
+    }
+
 }

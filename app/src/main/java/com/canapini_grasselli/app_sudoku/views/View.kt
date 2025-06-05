@@ -56,10 +56,10 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
 
                 Text(
                     text = "Difficoltà: ${gameState.difficulty.capitalize()}",
-                    // ...altri parametri
+                    style = MaterialTheme.typography.titleMedium
                 )
 
-                if (gameState.isCompleted) {
+                if (gameState.isCompleted) { //--------------------------------------------Da cambiare
                     Text(
                         text = "🎉 COMPLETATO! 🎉",
                         style = MaterialTheme.typography.titleMedium,
@@ -87,6 +87,15 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { viewModel.generateHint() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Suggerimento")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Pulsante nuovo gioco
         Button(

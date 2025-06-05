@@ -13,7 +13,8 @@ data class SudokuGame(
     val selectedCol: Int = -1,
     val isCompleted: Boolean = false,
     val mistakes: Int = 0,
-    val difficulty: String = ""
+    val difficulty: String = "",
+    val solution: List<List<Int>> = emptyList()
 )
 
 data class SudokuAPIResponse(

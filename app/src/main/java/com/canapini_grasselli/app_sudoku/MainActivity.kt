@@ -31,3 +31,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+//Cambiare i font
+//Mettere la localizzazione
