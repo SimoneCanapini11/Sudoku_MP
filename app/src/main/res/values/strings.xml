@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">App_Sudoku</string>
+    <string name="app_name" translatable="false">App_Sudoku</string>
+    <string name="errors">Errors: %1$s</string>
+    <string name="difficulty">Difficulty: %1$s</string>
+    <string name="hints">Hint</string>
+    <string name="new_game">New Game</string>
 </resources>

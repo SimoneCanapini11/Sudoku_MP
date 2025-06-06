@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,14 +20,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.canapini_grasselli.app_sudoku.R
 import com.canapini_grasselli.app_sudoku.model.SudokuCell
 import com.canapini_grasselli.app_sudoku.model.SudokuGame
 import com.canapini_grasselli.app_sudoku.model.SudokuViewModel
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,12 +56,12 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Errori: ${gameState.mistakes}",
+                    text = stringResource(R.string.errors, gameState.mistakes),
                     style = MaterialTheme.typography.titleMedium
                 )
 
                 Text(
-                    text = "Difficoltà: ${gameState.difficulty.capitalize()}",
+                    text = stringResource(R.string.difficulty, gameState.difficulty.capitalize()),
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -92,7 +98,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             onClick = { viewModel.generateHint() },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Suggerimento")
+            Text(stringResource(R.string.hints))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -102,7 +108,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             onClick = { viewModel.generateNewGame() },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Nuovo Gioco")
+            Text(stringResource(R.string.new_game))
         }
     }
 }
@@ -268,7 +274,16 @@ fun NumberKeyboard(
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(0.dp)
                 ) {
-                    Text("X", fontSize = 18.sp)
+                    //Text("X", fontSize = 18.sp)
+
+                      //  Icon(Icons.Filled.ArrowBack, contentDescription = "Indietro")
+                    Image(
+                        painter = painterResource(id = R.drawable.close_50),
+                        contentDescription = "Icona gomma",
+                        modifier = Modifier.size(40.dp)
+
+                    )
+
                 }
             }
         }

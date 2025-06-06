@@ -140,7 +140,7 @@ class SudokuViewModel : ViewModel() {
         val currentState = _gameState.value
         val row = currentState.selectedRow
         val col = currentState.selectedCol
-        val solution = currentState.solution ?: return // Se la soluzione non c'è, esci
+        val solution = currentState.solution // Se la soluzione non c'è, esci
 
         if (row == -1 || col == -1) return
         if (currentState.grid[row][col].isFixed) return
@@ -149,7 +149,7 @@ class SudokuViewModel : ViewModel() {
         setHint(correctNumber) // Usa una diversa logica dell'inserimento per suggerire un numero
     }
 
-    fun setHint(number: Int) {
+    private fun setHint(number: Int) {
         val currentState = _gameState.value
         val row = currentState.selectedRow
         val col = currentState.selectedCol
@@ -201,8 +201,6 @@ class SudokuViewModel : ViewModel() {
         val newGrid = tempGrid.mapIndexed { r, rowList ->
             rowList.mapIndexed { c, cell ->
                 if (conflictingCells.contains(Pair(r, c))) {
-                    cell.copy(isValid = false)
-                } else if (cell.isValid == false) {
                     cell.copy(isValid = false)
                 } else {
                     cell
