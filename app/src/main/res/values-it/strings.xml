@@ -5,4 +5,5 @@
     <string name="difficulty">Difficoltà: %1$s</string>
     <string name="hints">Suggerimento</string>
     <string name="new_game">Nuovo Gioco</string>
+    <string name="game_completed_you_win">Partita Terminata: Hai vinto</string>
 </resources>

@@ -55,22 +55,31 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = stringResource(R.string.errors, gameState.mistakes),
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Text(
-                    text = stringResource(R.string.difficulty, gameState.difficulty.capitalize()),
-                    style = MaterialTheme.typography.titleMedium
-                )
-
                 if (gameState.isCompleted) { //--------------------------------------------Da cambiare
+                    //Utilizzo la box per allineare al centro il testo
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.game_completed_you_win),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                } else { //Se si termina la partita e dopo si cancella uno dei numeri inseriti la partita continua
                     Text(
-                        text = "🎉 COMPLETATO! 🎉",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
+                        text = stringResource(R.string.errors, gameState.mistakes),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Text(
+                        text = stringResource(
+                            R.string.difficulty,
+                            gameState.difficulty.capitalize()
+                        ),
+                        style = MaterialTheme.typography.titleMedium
                     )
                 }
             }
