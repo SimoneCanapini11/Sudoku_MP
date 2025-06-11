@@ -75,10 +75,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                     )
 
                     Text(
-                        text = stringResource(
-                            R.string.difficulty,
-                            gameState.difficulty.capitalize()
-                        ),
+                        text = "Timer",
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -100,6 +97,33 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             onNumberClick = { number -> viewModel.setNumber(number) },
             onClearClick = { viewModel.clearCell() }
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Aiuti rimasti 3/3", //Localizzazione
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text(
+                    text = stringResource(
+                        R.string.difficulty,
+                        gameState.difficulty.capitalize()
+                    ),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
