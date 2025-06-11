@@ -6,4 +6,5 @@
     <string name="hints">Suggerimento</string>
     <string name="new_game">Nuovo Gioco</string>
     <string name="game_completed_you_win">Partita Terminata: Hai vinto</string>
+    <string name="timer">Timer: %1$s</string>
 </resources>

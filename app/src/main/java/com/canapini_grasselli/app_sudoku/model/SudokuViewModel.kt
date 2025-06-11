@@ -3,14 +3,19 @@ package com.canapini_grasselli.app_sudoku.model
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 class SudokuViewModel : ViewModel() {
     private val _gameState = MutableStateFlow(SudokuGame())
     val gameState: StateFlow<SudokuGame> = _gameState.asStateFlow()
+
+    private var timerJob: Job? = null
 
     init {
         generateNewGame()
@@ -55,6 +60,10 @@ class SudokuViewModel : ViewModel() {
             mistakes = newMistakes,
             isCompleted = isCompleted
         )
+
+        if (checkIfCompleted(newGrid)) {
+            stopTimer()
+        }
     }
 
     fun clearCell() {
@@ -89,6 +98,9 @@ class SudokuViewModel : ViewModel() {
                     difficulty = difficulty,
                     solution = solution
                 )
+
+                startTimer()
+
             } catch (e: Exception) {
                 // Stampa il tipo di eccezione e il messaggio nel logcat
                 Log.e("SudokuViewModel", "Errore generazione sudoku", e)
@@ -217,6 +229,31 @@ class SudokuViewModel : ViewModel() {
             mistakes = newMistakes,
             isCompleted = isCompleted
         )
+
+        if (checkIfCompleted(newGrid)) {
+            stopTimer()
+        }
     }
 
+    private fun startTimer() {
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
+            while (isActive) {
+                delay(1000)
+                _gameState.value = _gameState.value.copy(
+                    timerSeconds = _gameState.value.timerSeconds + 1
+                )
+            }
+        }
+    }
+
+    private fun stopTimer() {
+        timerJob?.cancel()
+    }
+
+    //Pulisci il timer quando il ViewModel viene distrutto
+    override fun onCleared() {
+        super.onCleared()
+        timerJob?.cancel()
+    }
 }

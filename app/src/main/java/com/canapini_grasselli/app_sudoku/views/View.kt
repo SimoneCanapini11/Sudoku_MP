@@ -75,7 +75,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                     )
 
                     Text(
-                        text = "Timer",
+                        text = stringResource(R.string.timer, gameState.timerSeconds.toTimeString()),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
