@@ -36,7 +36,16 @@ class MainActivity : ComponentActivity() {
 //landscape
 //mantieni stato partita in background
 //Inserire la possibilità di mettere in pausa e quando si riapre l'applicazione l'ultima partita messa in pausa viene ricaricata
-//Inserire un timer che conta il tempo dall'inizio della partita (Due modalità di gioco: 1)Libera il timer conta semplicemente il tempo a finire la partita 2)Sfida allo scadere del timer la partita termina con sconfitta)
+//Due modalità di gioco: 1)Libera il timer conta semplicemente il tempo a finire la partita 2)Sfida allo scadere del timer la partita termina con sconfitta
 //Appunti
 //Inserire logo app
 //Inserire un menu bottoni (Hint, Note, Home, Newgame)
+/*
+1.      Una interfaccia utente ben fatta!
+2.      Un database dei risultati precedenti
+·       Partire giocate
+·       Partite vinte (terminate)
+·       Miglior Tempo
+L'interfaccia dovrà inoltre implementare il massimo degli aiuti possibili all'utente tra cui almeno uno:
+·       Appunti utente per ognuna delle 81 celle
+*/
