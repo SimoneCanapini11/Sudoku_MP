@@ -96,7 +96,8 @@ class SudokuViewModel : ViewModel() {
                     isCompleted = false,
                     mistakes = 0,
                     difficulty = difficulty,
-                    solution = solution
+                    solution = solution,
+                    hintLeft = 3
                 )
 
                 startTimer()
@@ -152,13 +153,14 @@ class SudokuViewModel : ViewModel() {
         val currentState = _gameState.value
         val row = currentState.selectedRow
         val col = currentState.selectedCol
-        val solution = currentState.solution // Se la soluzione non c'è, esci
+        val solution = currentState.solution
 
         if (row == -1 || col == -1) return
         if (currentState.grid[row][col].isFixed) return
 
         val correctNumber = solution[row][col]
         setHint(correctNumber) // Usa una diversa logica dell'inserimento per suggerire un numero
+
     }
 
     private fun setHint(number: Int) {
@@ -227,7 +229,8 @@ class SudokuViewModel : ViewModel() {
         _gameState.value = currentState.copy(
             grid = newGrid,
             mistakes = newMistakes,
-            isCompleted = isCompleted
+            isCompleted = isCompleted,
+            hintLeft = currentState.hintLeft - 1
         )
 
         if (checkIfCompleted(newGrid)) {

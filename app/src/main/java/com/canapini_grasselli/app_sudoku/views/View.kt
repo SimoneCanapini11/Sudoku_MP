@@ -32,7 +32,6 @@ import com.canapini_grasselli.app_sudoku.model.SudokuGame
 import com.canapini_grasselli.app_sudoku.model.SudokuViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -112,19 +111,12 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Aiuti rimasti 3/3", //Localizzazione
+                    text = stringResource(R.string.hints_left, gameState.hintLeft), //Localizzazione
                     style = MaterialTheme.typography.titleMedium
                 )
 
                 Text(
-                    text = stringResource(
-                        R.string.difficulty,
-                        gameState.difficulty.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(
-                                Locale.ROOT
-                            ) else it.toString()
-                        }
-                    ),
+                    text = stringResource(R.string.difficulty, gameState.difficulty.capitalize()),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -134,6 +126,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
 
         Button(
             onClick = { viewModel.generateHint() },
+            enabled = gameState.hintLeft > 0,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.hints))

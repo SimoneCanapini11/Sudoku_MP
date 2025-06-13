@@ -6,4 +6,5 @@
     <string name="new_game">New Game</string>
     <string name="game_completed_you_win">Game Completed: You win</string>
     <string name="timer">Timer: %1$s</string>
+    <string name="hints_left">Hints left: %1$s/3</string>
 </resources>

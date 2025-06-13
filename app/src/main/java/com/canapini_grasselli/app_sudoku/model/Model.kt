@@ -15,7 +15,8 @@ data class SudokuGame(
     val mistakes: Int = 0,
     val difficulty: String = "",
     val solution: List<List<Int>> = emptyList(),
-    val timerSeconds: Int = 0
+    val timerSeconds: Int = 0,
+    val hintLeft: Int = 3
 )
 
 data class SudokuAPIResponse(
