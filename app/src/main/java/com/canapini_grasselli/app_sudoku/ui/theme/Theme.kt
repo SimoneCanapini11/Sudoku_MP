@@ -22,7 +22,9 @@ private val DarkColorScheme = darkColorScheme(
     background = Color(0xFF121212),
     onBackground = Color.White,
     surface = Color(0xFF121212),
-    onSurface = Color.White
+    primaryContainer = Color(0xFF4D3D7F),
+    onSurface = Color.White,
+    secondaryContainer = Color(0xFF85C1E9)
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -36,13 +38,16 @@ private val LightColorScheme = lightColorScheme(
     onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
+    primaryContainer = Color(0xFF4D3D7F),
+    onPrimaryContainer = Color.Black,
+    secondaryContainer = Color(0xFF85C1E9)
 )
 
 @Composable
 fun App_SudokuTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

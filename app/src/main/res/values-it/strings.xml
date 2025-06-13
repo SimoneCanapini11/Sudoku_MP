@@ -8,4 +8,6 @@
     <string name="game_completed_you_win">Partita Terminata: Hai vinto</string>
     <string name="timer">Timer: %1$s</string>
     <string name="hints_left">Aiuti rimasti: %1$s/3</string>
+    <string name="notes">Note</string>
+    <string name="pause">Pausa</string>
 </resources>

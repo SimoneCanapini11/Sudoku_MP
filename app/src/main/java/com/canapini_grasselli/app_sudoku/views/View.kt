@@ -1,25 +1,16 @@
 package com.canapini_grasselli.app_sudoku.views
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -34,10 +25,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
     val gameState by viewModel.gameState.collectAsState()
+    val notesActive by viewModel.notesActive.collectAsState()
+    val hintCount by viewModel.hintCount.collectAsState()
+    val isPaused by viewModel.isPaused.collectAsState()
 
     Column(
         modifier = Modifier
@@ -112,7 +105,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = stringResource(R.string.hints_left, gameState.hintLeft), //Localizzazione
+                    text = stringResource(R.string.hints_left, gameState.hintLeft),
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -132,7 +125,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
+      /* Button(
             onClick = { viewModel.generateHint() },
             enabled = gameState.hintLeft > 0,
             modifier = Modifier.fillMaxWidth()
@@ -148,7 +141,17 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.new_game))
-        }
+        }*/
+
+        BottomActionBar(
+            onNotes = { viewModel.toggleNotes() },
+            notesActive = notesActive,
+            onHint = { viewModel.generateHint() },
+            hintCount = hintCount,
+            onPause = { viewModel.togglePause() },
+            isPaused = isPaused,
+            onMenu = { /* TODO: menu */ }   // ----Aggiungi qui la logica per il menu
+        )
     }
 }
 
@@ -313,12 +316,9 @@ fun NumberKeyboard(
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(0.dp)
                 ) {
-                    //Text("X", fontSize = 18.sp)
-
-                      //  Icon(Icons.Filled.ArrowBack, contentDescription = "Indietro")
                     Image(
                         painter = painterResource(id = R.drawable.close_50),
-                        contentDescription = "Icona gomma",
+                        contentDescription = "X",
                         modifier = Modifier.size(40.dp)
 
                     )
@@ -344,6 +344,106 @@ fun NumberButton(
             text = number.toString(),
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+@Composable
+fun BottomActionBar(
+    onNotes: () -> Unit,
+    notesActive: Boolean,
+    onHint: () -> Unit,
+    hintCount: Int,
+    onPause: () -> Unit,
+    isPaused: Boolean,
+    onMenu: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .background(MaterialTheme.colorScheme.surface),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ActionButton(
+            iconRes = R.drawable.edit_note,
+            label = stringResource(R.string.notes),
+            onClick = onNotes,
+            isActive = notesActive,
+            badgeText = if (notesActive) "ON" else "OFF"
+        )
+        ActionButton(
+            iconRes = R.drawable.emoji_objects,
+            label = stringResource(R.string.hints),
+            onClick = onHint,
+            badgeText = if (hintCount > 0) hintCount.toString() else null
+        )
+        ActionButton(
+            iconRes = R.drawable.pause, //---- pause/play
+            label = stringResource(R.string.pause),
+            onClick = onPause,
+            isActive = isPaused
+        )
+        ActionButton(
+            iconRes = R.drawable.home,
+            label = stringResource(R.string.menu),
+            onClick = onMenu
+        )
+    }
+}
+
+@Composable
+fun ActionButton(
+    iconRes: Int,
+    label: String,
+    onClick: () -> Unit,
+    isActive: Boolean = false,
+    badgeText: String? = null
+) {
+    val backgroundColor = if (isActive) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+    val textColor = if (isActive) MaterialTheme.colorScheme.primary else Color.White
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .background(backgroundColor, shape = RoundedCornerShape(12.dp))
+            .clickable { onClick() }
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .widthIn(min = 64.dp)
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Box(contentAlignment = Alignment.TopEnd) {
+            Image(
+                painter = painterResource(id = iconRes),
+                contentDescription = label,
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(top = 8.dp)
+            )
+            if (badgeText != null) {
+                Box(
+                    modifier = Modifier
+                        .offset(x = 8.dp, y = (-6).dp)
+                        .background(
+                            color = if (isActive) MaterialTheme.colorScheme.primary else Color.DarkGray,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 4.dp, vertical = 1.dp)
+                ) {
+                    Text(
+                        text = badgeText,
+                        fontSize = 10.sp,
+                        color = Color.White
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = textColor
         )
     }
 }

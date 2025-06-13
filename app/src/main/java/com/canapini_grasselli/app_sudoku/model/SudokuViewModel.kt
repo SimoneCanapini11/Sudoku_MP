@@ -15,6 +15,15 @@ class SudokuViewModel : ViewModel() {
     private val _gameState = MutableStateFlow(SudokuGame())
     val gameState: StateFlow<SudokuGame> = _gameState.asStateFlow()
 
+    private val _notesActive = MutableStateFlow(false)
+    val notesActive: StateFlow<Boolean> = _notesActive
+
+    private val _hintCount = MutableStateFlow(3)
+    val hintCount: StateFlow<Int> = _hintCount
+
+    private val _isPaused = MutableStateFlow(false)
+    val isPaused: StateFlow<Boolean> = _isPaused
+
     private var timerJob: Job? = null
 
     init {
@@ -70,7 +79,7 @@ class SudokuViewModel : ViewModel() {
         setNumber(0)
     }
 
-    fun generateNewGame() {
+    private fun generateNewGame() {
         viewModelScope.launch {
             try {
                 val response = SudokuApiClient.service.getSudoku()
@@ -150,17 +159,20 @@ class SudokuViewModel : ViewModel() {
     }
 
     fun generateHint() {
-        val currentState = _gameState.value
-        val row = currentState.selectedRow
-        val col = currentState.selectedCol
-        val solution = currentState.solution
+        if (_hintCount.value > 0) {
+            val currentState = _gameState.value
+            val row = currentState.selectedRow
+            val col = currentState.selectedCol
+            val solution = currentState.solution
 
-        if (row == -1 || col == -1) return
-        if (currentState.grid[row][col].isFixed) return
+            if (row == -1 || col == -1) return
+            if (currentState.grid[row][col].isFixed) return
 
-        val correctNumber = solution[row][col]
-        setHint(correctNumber) // Usa una diversa logica dell'inserimento per suggerire un numero
+            val correctNumber = solution[row][col]
+            setHint(correctNumber) // Usa una diversa logica dell'inserimento per suggerire un numero
 
+            _hintCount.value -= 1
+        }
     }
 
     private fun setHint(number: Int) {
@@ -253,6 +265,15 @@ class SudokuViewModel : ViewModel() {
     private fun stopTimer() {
         timerJob?.cancel()
     }
+
+    fun toggleNotes() {
+        _notesActive.value = !_notesActive.value
+    }
+
+    fun togglePause() {
+        _isPaused.value = !_isPaused.value
+    }
+
 
     //Pulisci il timer quando il ViewModel viene distrutto
     override fun onCleared() {

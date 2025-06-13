@@ -7,4 +7,7 @@
     <string name="game_completed_you_win">Game Completed: You win</string>
     <string name="timer">Timer: %1$s</string>
     <string name="hints_left">Hints left: %1$s/3</string>
+    <string name="notes">Notes</string>
+    <string name="pause">Pause</string>
+    <string name="menu" translatable="false">Menu</string>
 </resources>
