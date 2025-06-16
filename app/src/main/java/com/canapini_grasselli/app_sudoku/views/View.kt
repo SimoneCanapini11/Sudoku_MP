@@ -125,24 +125,6 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-      /* Button(
-            onClick = { viewModel.generateHint() },
-            enabled = gameState.hintLeft > 0,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.hints))
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Pulsante nuovo gioco
-        Button(
-            onClick = { viewModel.generateNewGame() },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.new_game))
-        }*/
-
         BottomActionBar(
             onNotes = { viewModel.toggleNotes() },
             notesActive = notesActive,
