@@ -15,19 +15,6 @@ class SudokuViewModel : ViewModel() {
     private val _gameState = MutableStateFlow(SudokuGame())
     val gameState: StateFlow<SudokuGame> = _gameState.asStateFlow()
 
-    /*
-    private val _notesActive = MutableStateFlow(false)
-    val notesActive: StateFlow<Boolean> = _notesActive //Mettere nel gameState
-
-
-    private val _hintCount = MutableStateFlow(3)
-    val hintCount: StateFlow<Int> = _hintCount
-
-
-    private val _isPaused = MutableStateFlow(false)
-    val isPaused: StateFlow<Boolean> = _isPaused
-     */
-
     private var timerJob: Job? = null
 
     init {
@@ -189,7 +176,7 @@ class SudokuViewModel : ViewModel() {
         val tempGrid = currentState.grid.mapIndexed { r, rowList ->
             rowList.mapIndexed { c, cell ->
                 if (r == row && c == col) {
-                    cell.copy(value = number, isValid = true)
+                    cell.copy(value = number, isValid = true, isFixed = true)
                 } else {
                     cell
                 }
@@ -287,6 +274,9 @@ class SudokuViewModel : ViewModel() {
 
         if (isPaused == true) {
             stopTimer()
+            //Salva il tempo corrente in una variabile
+        } else {
+            startTimer()
         }
         //Creare una funzione continueTimer()
     }

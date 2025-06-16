@@ -360,7 +360,8 @@ fun BottomActionBar(
             enabled = hintCount > 0
         )
         ActionButton(
-            iconRes = R.drawable.pause, //---- pause/play
+            iconRes = R.drawable.pause, //pause/play
+            iconContinue = R.drawable.play_arrow,
             label = stringResource(R.string.pause),
             onClick = onPause,
             isActive = isPaused
@@ -376,6 +377,7 @@ fun BottomActionBar(
 @Composable
 fun ActionButton(
     iconRes: Int,
+    iconContinue: Int? = null,
     label: String,
     onClick: () -> Unit,
     isActive: Boolean = false,
@@ -403,13 +405,23 @@ fun ActionButton(
     ) {
         Spacer(modifier = Modifier.height(8.dp))
         Box(contentAlignment = Alignment.TopEnd) {
-            Image(
-                painter = painterResource(id = iconRes),
-                contentDescription = label,
-                modifier = Modifier
-                    .size(48.dp)
-                    .padding(top = 8.dp)
-            )
+            if ((iconContinue != null) && (isActive == true)) {
+                Image(
+                    painter = painterResource(id = iconContinue),
+                    contentDescription = label,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(top = 8.dp)
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = label,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(top = 8.dp)
+                )
+            }
             if (badgeText != null) {
                 Box(
                     modifier = Modifier
