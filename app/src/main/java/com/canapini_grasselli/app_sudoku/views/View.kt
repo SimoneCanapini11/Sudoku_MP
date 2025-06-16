@@ -28,9 +28,6 @@ import java.util.Locale
 @Composable
 fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
     val gameState by viewModel.gameState.collectAsState()
-    val notesActive by viewModel.notesActive.collectAsState()
-    val hintCount by viewModel.hintCount.collectAsState()
-    val isPaused by viewModel.isPaused.collectAsState()
 
     Column(
         modifier = Modifier
@@ -125,13 +122,14 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        //Menu di bottoni
         BottomActionBar(
             onNotes = { viewModel.toggleNotes() },
-            notesActive = notesActive,
+            notesActive = gameState.isNotesActive,
             onHint = { viewModel.generateHint() },
-            hintCount = hintCount,
+            hintCount = gameState.hintLeft,
             onPause = { viewModel.togglePause() },
-            isPaused = isPaused,
+            isPaused = gameState.isPaused,
             onMenu = { /* TODO: menu */ }   // ----Aggiungi qui la logica per il menu
         )
     }
@@ -338,7 +336,7 @@ fun BottomActionBar(
     hintCount: Int,
     onPause: () -> Unit,
     isPaused: Boolean,
-    onMenu: () -> Unit
+    onMenu: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -359,7 +357,7 @@ fun BottomActionBar(
             iconRes = R.drawable.emoji_objects,
             label = stringResource(R.string.hints),
             onClick = onHint,
-            badgeText = if (hintCount > 0) hintCount.toString() else null
+            enabled = hintCount > 0
         )
         ActionButton(
             iconRes = R.drawable.pause, //---- pause/play
@@ -381,16 +379,25 @@ fun ActionButton(
     label: String,
     onClick: () -> Unit,
     isActive: Boolean = false,
-    badgeText: String? = null
+    badgeText: String? = null,
+    enabled: Boolean = true
 ) {
-    val backgroundColor = if (isActive) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
-    val textColor = if (isActive) MaterialTheme.colorScheme.primary else Color.White
+    //val backgroundColor = if (isActive) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+    val backgroundColor = when {
+        !enabled ->  MaterialTheme.colorScheme.secondary // Cambia colore se disabilitato
+        isActive -> MaterialTheme.colorScheme.secondary
+        else -> MaterialTheme.colorScheme.primary
+    }
+    val textColor = Color.White
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .background(backgroundColor, shape = RoundedCornerShape(12.dp))
-            .clickable { onClick() }
+            .then(
+                if (enabled) Modifier.clickable { onClick() }
+                else Modifier // Non clickable se disabilitato
+            )
             .padding(horizontal = 8.dp, vertical = 8.dp)
             .widthIn(min = 64.dp)
     ) {

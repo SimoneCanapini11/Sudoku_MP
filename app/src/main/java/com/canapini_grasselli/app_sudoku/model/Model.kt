@@ -16,7 +16,9 @@ data class SudokuGame(
     val difficulty: String = "",
     val solution: List<List<Int>> = emptyList(),
     val timerSeconds: Int = 0,
-    val hintLeft: Int = 3
+    val hintLeft: Int = 3,
+    val isPaused: Boolean = false,
+    val isNotesActive: Boolean = false
 )
 
 data class SudokuAPIResponse(

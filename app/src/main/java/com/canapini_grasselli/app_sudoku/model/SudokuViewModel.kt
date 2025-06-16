@@ -15,14 +15,18 @@ class SudokuViewModel : ViewModel() {
     private val _gameState = MutableStateFlow(SudokuGame())
     val gameState: StateFlow<SudokuGame> = _gameState.asStateFlow()
 
+    /*
     private val _notesActive = MutableStateFlow(false)
-    val notesActive: StateFlow<Boolean> = _notesActive
+    val notesActive: StateFlow<Boolean> = _notesActive //Mettere nel gameState
+
 
     private val _hintCount = MutableStateFlow(3)
     val hintCount: StateFlow<Int> = _hintCount
 
+
     private val _isPaused = MutableStateFlow(false)
     val isPaused: StateFlow<Boolean> = _isPaused
+     */
 
     private var timerJob: Job? = null
 
@@ -159,7 +163,7 @@ class SudokuViewModel : ViewModel() {
     }
 
     fun generateHint() {
-        if (_hintCount.value > 0) {
+
             val currentState = _gameState.value
             val row = currentState.selectedRow
             val col = currentState.selectedCol
@@ -171,8 +175,6 @@ class SudokuViewModel : ViewModel() {
             val correctNumber = solution[row][col]
             setHint(correctNumber) // Usa una diversa logica dell'inserimento per suggerire un numero
 
-            _hintCount.value -= 1
-        }
     }
 
     private fun setHint(number: Int) {
@@ -267,13 +269,27 @@ class SudokuViewModel : ViewModel() {
     }
 
     fun toggleNotes() {
-        _notesActive.value = !_notesActive.value
+        val currentState = _gameState.value
+        val isNotesActive = !currentState.isNotesActive
+
+        _gameState.value = currentState.copy(
+            isNotesActive = isNotesActive
+        )
     }
 
     fun togglePause() {
-        _isPaused.value = !_isPaused.value
-    }
+        val currentState = _gameState.value
+        val isPaused = !currentState.isPaused
 
+        _gameState.value = currentState.copy(
+            isPaused = isPaused
+        )
+
+        if (isPaused == true) {
+            stopTimer()
+        }
+        //Creare una funzione continueTimer()
+    }
 
     //Pulisci il timer quando il ViewModel viene distrutto
     override fun onCleared() {
