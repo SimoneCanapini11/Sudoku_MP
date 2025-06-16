@@ -32,37 +32,42 @@ class SudokuViewModel : ViewModel() {
         val currentState = _gameState.value
         val row = currentState.selectedRow
         val col = currentState.selectedCol
+        val notes = currentState.isNotesActive
 
         if (row == -1 || col == -1) return
         if (currentState.grid[row][col].isFixed) return
 
-        val newGrid = currentState.grid.map { rowList ->
-            rowList.toMutableList()
-        }.toMutableList()
-
-        val newCell = newGrid[row][col].copy(value = number)
-        newGrid[row][col] = newCell
-
-        // Valida la mossa
-        val isValid = isValidMove(newGrid, row, col, number)
-        newGrid[row][col] = newCell.copy(isValid = isValid)
-
-        val newMistakes = if (!isValid && number != 0) {
-            currentState.mistakes + 1
+        if (notes == true) {
+            setNote(row, col, number)
         } else {
-            currentState.mistakes
-        }
+            val newGrid = currentState.grid.map { rowList ->
+                rowList.toMutableList()
+            }.toMutableList()
 
-        val isCompleted = checkIfCompleted(newGrid)
+            val newCell = newGrid[row][col].copy(value = number)
+            newGrid[row][col] = newCell
 
-        _gameState.value = currentState.copy(
-            grid = newGrid,
-            mistakes = newMistakes,
-            isCompleted = isCompleted
-        )
+            // Valida la mossa
+            val isValid = isValidMove(newGrid, row, col, number)
+            newGrid[row][col] = newCell.copy(isValid = isValid)
 
-        if (checkIfCompleted(newGrid)) {
-            stopTimer()
+            val newMistakes = if (!isValid && number != 0) {
+                currentState.mistakes + 1
+            } else {
+                currentState.mistakes
+            }
+
+            val isCompleted = checkIfCompleted(newGrid)
+
+            _gameState.value = currentState.copy(
+                grid = newGrid,
+                mistakes = newMistakes,
+                isCompleted = isCompleted
+            )
+
+            if (checkIfCompleted(newGrid)) {
+                stopTimer()
+            }
         }
     }
 
@@ -176,7 +181,7 @@ class SudokuViewModel : ViewModel() {
         val tempGrid = currentState.grid.mapIndexed { r, rowList ->
             rowList.mapIndexed { c, cell ->
                 if (r == row && c == col) {
-                    cell.copy(value = number, isValid = true, isFixed = true)
+                    cell.copy(value = number, isValid = true, isFixed = true, notes = 0)
                 } else {
                     cell
                 }
@@ -274,11 +279,31 @@ class SudokuViewModel : ViewModel() {
 
         if (isPaused == true) {
             stopTimer()
-            //Salva il tempo corrente in una variabile
+            //Trovare il modo per bloccre funzionalità all'utente
         } else {
             startTimer()
         }
-        //Creare una funzione continueTimer()
+    }
+
+    private fun setNote(row: Int, col: Int, number: Int) {
+        val currentState = _gameState.value
+        val currentCell = currentState.grid[row][col]
+
+        // Non permettere appunti se la cella è fissa
+        if (currentCell.isFixed) return
+
+        // Crea una nuova griglia per mantenere l'immutabilità
+        val newGrid = currentState.grid.map { it.toMutableList() }.toMutableList()
+
+        // Se la nota è uguale al numero del valore della cella, la rimuoviamo (metti 0)
+        // altrimenti, impostiamo la nuova nota
+        val newNote = if (currentCell.value == number) 0 else number
+
+        // Aggiorna la cella con la nuova nota
+        newGrid[row][col] = currentCell.copy(notes = newNote)
+
+        // Aggiorna lo stato del gioco
+        _gameState.value = currentState.copy(grid = newGrid)
     }
 
     //Pulisci il timer quando il ViewModel viene distrutto

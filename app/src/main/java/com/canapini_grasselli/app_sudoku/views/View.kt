@@ -228,7 +228,6 @@ fun SudokuCell(
         else -> MaterialTheme.colorScheme.onSurface
     }
 
-
     Box(
         modifier = modifier
             .aspectRatio(1f)
@@ -247,6 +246,18 @@ fun SudokuCell(
                 fontWeight = if (cell.isFixed) FontWeight.Bold else FontWeight.Medium,
                 color = textColor,
                 textAlign = TextAlign.Center
+            )
+        }
+
+        // Mostra gli appunti se presenti
+        if (cell.notes != 0) {
+            Text(
+                text = cell.notes.toString(),
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 2.dp, end = 4.dp)
             )
         }
     }

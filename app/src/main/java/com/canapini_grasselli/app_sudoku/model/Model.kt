@@ -4,7 +4,8 @@ package com.canapini_grasselli.app_sudoku.model
 data class SudokuCell(
     val value: Int = 0,
     val isFixed: Boolean = false,
-    val isValid: Boolean = true
+    val isValid: Boolean = true,
+    val notes: Int = 0
 )
 
 data class SudokuGame(

@@ -32,6 +32,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+//Bug: Con il gioco in pausa non si può cliccare e inserire nuovi numeri
 //Cambiare i font
 //landscape
 //mantieni stato partita in background
