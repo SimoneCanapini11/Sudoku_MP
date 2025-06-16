@@ -4,20 +4,12 @@ import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface GameResultDAO {
+interface SudokuGameDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertGame(game: SudokuGameEntity)
 
-    @Insert
-    suspend fun insertResult(result: GameResult)
+    @Query("SELECT * FROM sudoku_games ORDER BY timestamp DESC LIMIT 1")
+    suspend fun getLastGame(): SudokuGameEntity?
 
-    @Query("SELECT COUNT(*) FROM game_results")
-    fun countGamesPlayed(): Flow<Int>
-
-    @Query("SELECT COUNT(*) FROM game_results WHERE completed = 1")
-    fun countGamesWon(): Flow<Int>
-
-    @Query("SELECT MIN(timeInSeconds) FROM game_results WHERE completed = 1 AND timeInSeconds > 0")
-    fun getBestTime(): Flow<Int?>
-
-    @Query("SELECT * FROM game_results ORDER BY timestamp DESC")
-    fun getAllResults(): Flow<List<GameResult>>
+    //---query per best time
 }
