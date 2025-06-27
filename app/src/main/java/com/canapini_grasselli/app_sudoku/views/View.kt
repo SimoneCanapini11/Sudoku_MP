@@ -25,6 +25,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import java.util.Locale
 
+//Schermata del sudoku
 @Composable
 fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
     val gameState by viewModel.gameState.collectAsState()
