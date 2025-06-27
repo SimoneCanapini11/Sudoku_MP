@@ -35,89 +35,93 @@ fun HomeScreen(
     onNavigateToSettings: () -> Unit,
     onExit: () -> Unit
 ) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
     ) {
-        // Titolo
-        Text(
-            text = "Sudoku",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
-
-        // Pulsanti principali
-        Button(
-            onClick = onNavigateToGame,
+        // Top bar con bottoni Impostazioni e Esci
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
+                .align(Alignment.TopCenter),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = "Nuova Partita",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+            // Bottone Esci
+            IconButton(
+                onClick = onExit
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_exit_to_app),
+                    contentDescription = "Esci",
+                    modifier = Modifier.size(50.dp)
+                )
+            }
+
+            // Bottone Impostazioni
+            IconButton(
+                onClick = onNavigateToSettings
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_color),
+                    contentDescription = "Impostazioni",
+                    modifier = Modifier.size(50.dp)
+                )
+            }
         }
 
-        Button(
-            onClick = onNavigateToLoadGame,
+        // Contenuto centrale con logo e bottoni
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp)
+                .align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = "Carica Partita",
-                style = MaterialTheme.typography.titleMedium
+                text = "Sudoku",
+                style = MaterialTheme.typography.displayMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 24.dp)
             )
-        }
 
-        Button(
-            onClick = onNavigateToStats,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text(
-                text = "Statistiche",
-                style = MaterialTheme.typography.titleMedium
+            // Logo
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo App",
+                modifier = Modifier.size(200.dp)
             )
-        }
 
-        Button(
-            onClick = onNavigateToSettings,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text(
-                text = "Impostazioni",
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.weight(1f))
+            // Bottoni principali
+            Button(
+                onClick = onNavigateToGame ,
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .height(56.dp)
+            ) {
+                Text("Nuova Partita", fontSize = 18.sp)
+            }
 
-        // Pulsante Esci in fondo
-        Button(
-            onClick = onExit,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.error
-            )
-        ) {
-            Text(
-                text = "Esci",
-                style = MaterialTheme.typography.titleMedium
-            )
+            Button(
+                onClick = onNavigateToLoadGame ,
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .height(56.dp)
+            ) {
+                Text("Continua", fontSize = 18.sp)
+            }
+
+            Button(
+                onClick = onNavigateToStats ,
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .height(56.dp)
+            ) {
+                Text("Statistiche", fontSize = 18.sp)
+            }
         }
     }
 }
@@ -132,26 +136,39 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
     // Mostra il dialogo di conferma se showExitDialog è true
     if (showExitDialog) {
         AlertDialog(
-            onDismissRequest = { showExitDialog = false },
+            onDismissRequest = {  },
             title = { Text("Tornare al menu?") },
             text = { Text("La partita in corso verrà salvata automaticamente.") },
             confirmButton = {
-                Button(
-                    onClick = {
-                        // Salva la partita se necessario
-                      //---  viewModel.saveGameState()
-                        // Naviga alla home
-                        navController.navigate("home") {
-                            popUpTo("home") { inclusive = true }
-                        }
-                    }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Text("Conferma")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showExitDialog = false }) {
-                    Text("Annulla")
+                    Button(
+                        modifier = Modifier.width(120.dp), // Larghezza fissa per entrambi i bottoni
+                        onClick = {
+                            // Salva la partita se necessario
+                            //---  viewModel.saveGameState()
+
+                            // Naviga alla home
+                            navController.navigate("home") {
+                                popUpTo("home") { inclusive = true }
+                            }
+
+                            showExitDialog = false
+                        }
+                    ) {
+                        Text("Conferma")
+                    }
+                    Spacer(modifier = Modifier.width(16.dp)) // Spazio tra i bottoni
+                    Button(
+                        modifier = Modifier.width(120.dp), // Stessa larghezza del bottone Conferma
+                        onClick = { showExitDialog = false
+                                    viewModel.togglePause()
+                        }
+                    ) {
+                        Text("Annulla")
+                    }
                 }
             }
         )
@@ -259,7 +276,9 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
             hintCount = gameState.hintLeft,
             onPause = { viewModel.togglePause() },
             isPaused = gameState.isPaused,
-            onMenu = { showExitDialog = true }
+            onMenu = { showExitDialog = true
+                       viewModel.togglePause() //Mette il gioco in pausa
+            }
         )
     }
 }
