@@ -34,6 +34,7 @@ class SudokuViewModel : ViewModel() {
         val col = currentState.selectedCol
         val notes = currentState.isNotesActive
 
+        if (currentState.isPaused) return
         if (row == -1 || col == -1) return
         if (currentState.grid[row][col].isFixed) return
 
@@ -174,6 +175,7 @@ class SudokuViewModel : ViewModel() {
         val row = currentState.selectedRow
         val col = currentState.selectedCol
 
+        if (currentState.isPaused) return
         if (row == -1 || col == -1) return
         if (currentState.grid[row][col].isFixed) return
 
@@ -279,7 +281,6 @@ class SudokuViewModel : ViewModel() {
 
         if (isPaused == true) {
             stopTimer()
-            //Trovare il modo per bloccre funzionalità all'utente
         } else {
             startTimer()
         }
