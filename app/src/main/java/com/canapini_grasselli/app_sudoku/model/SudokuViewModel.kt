@@ -1,8 +1,10 @@
 package com.canapini_grasselli.app_sudoku.model
 
 import android.util.Log
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.canapini_grasselli.app_sudoku.ui.navigation.Navigation
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,6 +12,45 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+
+class NavigationViewModel : ViewModel() {
+    // Eventi di navigazione
+    sealed class NavigationEvent {
+        object NavigateToGame : NavigationEvent()
+        object NavigateToLoadGame : NavigationEvent()
+        object NavigateToStats : NavigationEvent()
+        object NavigateToSettings : NavigationEvent()
+        object Exit : NavigationEvent()
+    }
+
+    private val _navigationEvent = MutableStateFlow<NavigationEvent?>(null)
+    val navigationEvent: StateFlow<NavigationEvent?> = _navigationEvent.asStateFlow()
+
+    fun onNewGameClick() {
+        _navigationEvent.value = NavigationEvent.NavigateToGame
+    }
+
+    fun onLoadGameClick() {
+        _navigationEvent.value = NavigationEvent.NavigateToLoadGame
+    }
+
+    fun onStatsClick() {
+        _navigationEvent.value = NavigationEvent.NavigateToStats
+    }
+
+    fun onSettingsClick() {
+        _navigationEvent.value = NavigationEvent.NavigateToSettings
+    }
+
+    fun onExitClick() {
+        _navigationEvent.value = NavigationEvent.Exit
+    }
+
+    // Resetta l'evento dopo che è stato gestito
+    fun onNavigationEventHandled() {
+        _navigationEvent.value = null
+    }
+}
 
 class SudokuViewModel : ViewModel() {
     private val _gameState = MutableStateFlow(SudokuGame())
@@ -312,4 +353,6 @@ class SudokuViewModel : ViewModel() {
         super.onCleared()
         timerJob?.cancel()
     }
+
+    
 }

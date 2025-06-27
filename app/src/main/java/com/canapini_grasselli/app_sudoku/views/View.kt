@@ -23,11 +23,140 @@ import com.canapini_grasselli.app_sudoku.model.SudokuGame
 import com.canapini_grasselli.app_sudoku.model.SudokuViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavController
 import java.util.Locale
 
+//Schermata Home
 @Composable
-fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
+fun HomeScreen(
+    onNavigateToGame: () -> Unit,
+    onNavigateToLoadGame: () -> Unit,
+    onNavigateToStats: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onExit: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Titolo
+        Text(
+            text = "Sudoku",
+            style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
+
+        // Pulsanti principali
+        Button(
+            onClick = onNavigateToGame,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            )
+        ) {
+            Text(
+                text = "Nuova Partita",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+
+        Button(
+            onClick = onNavigateToLoadGame,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = "Carica Partita",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+        Button(
+            onClick = onNavigateToStats,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = "Statistiche",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+        Button(
+            onClick = onNavigateToSettings,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = "Impostazioni",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Pulsante Esci in fondo
+        Button(
+            onClick = onExit,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.error
+            )
+        ) {
+            Text(
+                text = "Esci",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+    }
+}
+
+
+//Schermata Sudoku
+@Composable
+fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavController) {
     val gameState by viewModel.gameState.collectAsState()
+    var showExitDialog by remember { mutableStateOf(false) }
+
+    // Mostra il dialogo di conferma se showExitDialog è true
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text("Tornare al menu?") },
+            text = { Text("La partita in corso verrà salvata automaticamente.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        // Salva la partita se necessario
+                      //---  viewModel.saveGameState()
+                        // Naviga alla home
+                        navController.navigate("home") {
+                            popUpTo("home") { inclusive = true }
+                        }
+                    }
+                ) {
+                    Text("Conferma")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showExitDialog = false }) {
+                    Text("Annulla")
+                }
+            }
+        )
+    }
+
 
     Column(
         modifier = Modifier
@@ -130,7 +259,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel()) {
             hintCount = gameState.hintLeft,
             onPause = { viewModel.togglePause() },
             isPaused = gameState.isPaused,
-            onMenu = { /* TODO: menu */ }   // ----Aggiungi qui la logica per il menu
+            onMenu = { showExitDialog = true }
         )
     }
 }
