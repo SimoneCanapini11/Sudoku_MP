@@ -10,4 +10,11 @@
     <string name="hints_left">Aiuti rimasti: %1$s/3</string>
     <string name="notes">Note</string>
     <string name="pause">Pausa</string>
+    <string name="new_sudoku_game">Nuova Partita</string>
+    <string name="cont_game">Continua Partita</string>
+    <string name="statistics">Statistiche</string>
+    <string name="return_to_menu">Tornare al menu?</string>
+    <string name="current_game_saved">La partita in corso verrà salvata automaticamente.</string>
+    <string name="confirm">Conferma</string>
+    <string name="cancel">Annulla</string>
 </resources>

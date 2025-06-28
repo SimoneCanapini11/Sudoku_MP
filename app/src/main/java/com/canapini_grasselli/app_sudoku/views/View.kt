@@ -53,7 +53,7 @@ fun HomeScreen(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_exit_to_app),
-                    contentDescription = "Esci",
+                    contentDescription = "Exit_to_app",
                     modifier = Modifier.size(50.dp)
                 )
             }
@@ -64,7 +64,7 @@ fun HomeScreen(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_color),
-                    contentDescription = "Impostazioni",
+                    contentDescription = "Font",
                     modifier = Modifier.size(50.dp)
                 )
             }
@@ -79,7 +79,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = "Sudoku",
+                text = stringResource(R.string.sudoku_title),
                 style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -102,7 +102,7 @@ fun HomeScreen(
                     .fillMaxWidth(0.85f)
                     .height(56.dp)
             ) {
-                Text("Nuova Partita", fontSize = 18.sp)
+                Text(stringResource(R.string.new_sudoku_game), fontSize = 18.sp)
             }
 
             Button(
@@ -111,7 +111,7 @@ fun HomeScreen(
                     .fillMaxWidth(0.85f)
                     .height(56.dp)
             ) {
-                Text("Continua", fontSize = 18.sp)
+                Text(stringResource(R.string.cont_game), fontSize = 18.sp)
             }
 
             Button(
@@ -120,7 +120,7 @@ fun HomeScreen(
                     .fillMaxWidth(0.85f)
                     .height(56.dp)
             ) {
-                Text("Statistiche", fontSize = 18.sp)
+                Text(stringResource(R.string.statistics), fontSize = 18.sp)
             }
         }
     }
@@ -137,8 +137,9 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = {  },
-            title = { Text("Tornare al menu?") },
-            text = { Text("La partita in corso verrà salvata automaticamente.") },
+            title = { Text(stringResource(R.string.return_to_menu),
+                            fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(R.string.current_game_saved)) },
             confirmButton = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -158,7 +159,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                             showExitDialog = false
                         }
                     ) {
-                        Text("Conferma")
+                        Text(stringResource(R.string.confirm))
                     }
                     Spacer(modifier = Modifier.width(16.dp)) // Spazio tra i bottoni
                     Button(
@@ -167,7 +168,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                                     viewModel.togglePause()
                         }
                     ) {
-                        Text("Annulla")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             }
@@ -564,7 +565,7 @@ fun ActionButton(
     ) {
         Spacer(modifier = Modifier.height(8.dp))
         Box(contentAlignment = Alignment.TopEnd) {
-            if ((iconContinue != null) && (isActive == true)) {
+            if ((iconContinue != null) && isActive) {
                 Image(
                     painter = painterResource(id = iconContinue),
                     contentDescription = label,

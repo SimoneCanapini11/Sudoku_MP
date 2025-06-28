@@ -10,4 +10,12 @@
     <string name="notes">Notes</string>
     <string name="pause">Pause</string>
     <string name="menu" translatable="false">Menu</string>
+    <string name="new_sudoku_game">New Game</string>
+    <string name="cont_game">Continue Game</string>
+    <string name="statistics">Statistics</string>
+    <string name="return_to_menu">Return to menu?</string>
+    <string name="current_game_saved">The current game will be saved automatically.</string>
+    <string name="sudoku_title" translatable="false">Sudoku</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
 </resources>
