@@ -22,8 +22,13 @@ import com.canapini_grasselli.app_sudoku.model.SudokuCell
 import com.canapini_grasselli.app_sudoku.model.SudokuGame
 import com.canapini_grasselli.app_sudoku.model.SudokuViewModel
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
+import com.canapini_grasselli.app_sudoku.model.AppTheme
+import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
+import com.canapini_grasselli.app_sudoku.ui.theme.Green40
+import com.canapini_grasselli.app_sudoku.ui.theme.Purple40
 import java.util.Locale
 
 //Schermata Home
@@ -32,12 +37,50 @@ fun HomeScreen(
     onNavigateToGame: () -> Unit,
     onNavigateToLoadGame: () -> Unit,
     onNavigateToStats: () -> Unit,
-    onNavigateToSettings: () -> Unit,
-    onExit: () -> Unit
+    onExit: () -> Unit,
+    themeViewModel: ThemeViewModel = viewModel() //Per cambiare font
 ) {
     var showExitDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
+    val currentTheme by themeViewModel.currentTheme.collectAsState()
 
-    // Aggiungi l'AlertDialog
+    // Selezione del font
+    if (showThemeDialog) {
+        AlertDialog(
+            onDismissRequest = { showThemeDialog = false },
+            title = {
+                Text(
+                    "Seleziona il tema",
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column {
+                    ThemeOption(
+                        text = "Tema Viola",
+                        selected = currentTheme == AppTheme.PURPLE,
+                        color = Purple40
+                    ) {
+                        themeViewModel.setTheme(AppTheme.PURPLE)
+                        showThemeDialog = false
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    ThemeOption(
+                        text = "Tema Verde",
+                        selected = currentTheme == AppTheme.GREEN,
+                        color = Green40
+                    ) {
+                        themeViewModel.setTheme(AppTheme.GREEN)
+                        showThemeDialog = false
+                    }
+                }
+            },
+            confirmButton = {}
+        )
+    }
+
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { },
@@ -81,7 +124,7 @@ fun HomeScreen(
             .fillMaxSize()
             .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
     ) {
-        // Top bar con bottoni Impostazioni e Esci
+        // Top bar con bottoni Font e Esci
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -99,9 +142,9 @@ fun HomeScreen(
                 )
             }
 
-            // Bottone Impostazioni
+            // Bottone Font
             IconButton(
-                onClick = onNavigateToSettings
+                onClick = { showThemeDialog = true }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_color),
@@ -646,6 +689,36 @@ fun ActionButton(
             text = label,
             fontSize = 12.sp,
             color = textColor
+        )
+    }
+}
+
+
+@Composable
+private fun ThemeOption(
+    text: String,
+    selected: Boolean,
+    color: Color,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text)
+        Spacer(modifier = Modifier.width(8.dp))
+        Box(
+            modifier = Modifier
+                .size(24.dp)
+                .background(color = color, shape = CircleShape)
         )
     }
 }

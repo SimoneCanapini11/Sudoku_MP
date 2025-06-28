@@ -1,6 +1,5 @@
 package com.canapini_grasselli.app_sudoku.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -11,8 +10,9 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.canapini_grasselli.app_sudoku.model.AppTheme
 
-private val DarkColorScheme = darkColorScheme(
+private val PurpleDarkColorScheme = darkColorScheme(
     primary = Purple80,
     onPrimary = Color.Black,
     secondary = PurpleGrey80,
@@ -27,7 +27,7 @@ private val DarkColorScheme = darkColorScheme(
     secondaryContainer = Color(0xFF85C1E9)
 )
 
-private val LightColorScheme = lightColorScheme(
+private val PurpleLightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40,
@@ -37,17 +37,40 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = Color.White,
     onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    primaryContainer = Color(0xFF4D3D7F),
-    onPrimaryContainer = Color.Black,
-    secondaryContainer = Color(0xFF85C1E9)
+    onSurface = Color(0xFF1C1B1F)
+)
+
+private val GreenDarkColorScheme = darkColorScheme(
+    primary = Green80,
+    onPrimary = Color.Black,
+    secondary = Green80,
+    onSecondary = Color.Black,
+    tertiary = Green80,
+    background = Color(0xFFFFFBFE),
+    surface = Color(0xFFFFFBFE),
+    onTertiary = Color.White,
+    onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F)
+)
+
+private val GreenLightColorScheme = lightColorScheme(
+    primary = Green40,
+    secondary = Green40,
+    tertiary = Green40,
+    background = Color(0xFFFFFBFE),
+    surface = Color(0xFFFFFBFE),
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F)
 )
 
 @Composable
 fun App_SudokuTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
+    appTheme: AppTheme = AppTheme.PURPLE,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -56,8 +79,14 @@ fun App_SudokuTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> when (appTheme) {
+            AppTheme.PURPLE -> PurpleDarkColorScheme
+            AppTheme.GREEN -> GreenDarkColorScheme
+        }
+        else -> when (appTheme) {
+            AppTheme.PURPLE -> PurpleLightColorScheme
+            AppTheme.GREEN -> GreenLightColorScheme
+        }
     }
 
     MaterialTheme(

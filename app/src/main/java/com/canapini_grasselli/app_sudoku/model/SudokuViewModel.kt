@@ -1,10 +1,8 @@
 package com.canapini_grasselli.app_sudoku.model
 
 import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.canapini_grasselli.app_sudoku.ui.navigation.Navigation
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,14 +11,29 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
+
+class ThemeViewModel : ViewModel() {
+    private val _currentTheme = MutableStateFlow(AppTheme.PURPLE)
+    val currentTheme: StateFlow<AppTheme> = _currentTheme.asStateFlow()
+
+    fun setTheme(theme: AppTheme) {
+        _currentTheme.value = theme
+    }
+}
+
+enum class AppTheme {
+    PURPLE,
+    GREEN
+}
+
 class NavigationViewModel : ViewModel() {
     // Eventi di navigazione
     sealed class NavigationEvent {
-        object NavigateToGame : NavigationEvent()
-        object NavigateToLoadGame : NavigationEvent()
-        object NavigateToStats : NavigationEvent()
-        object NavigateToSettings : NavigationEvent()
-        object Exit : NavigationEvent()
+        data object NavigateToGame : NavigationEvent()
+        data object NavigateToLoadGame : NavigationEvent()
+        data object NavigateToStats : NavigationEvent()
+        data object NavigateToSettings : NavigationEvent()
+        data object Exit : NavigationEvent()
     }
 
     private val _navigationEvent = MutableStateFlow<NavigationEvent?>(null)
@@ -36,10 +49,6 @@ class NavigationViewModel : ViewModel() {
 
     fun onStatsClick() {
         _navigationEvent.value = NavigationEvent.NavigateToStats
-    }
-
-    fun onSettingsClick() {
-        _navigationEvent.value = NavigationEvent.NavigateToSettings
     }
 
     fun onExitClick() {
@@ -79,7 +88,7 @@ class SudokuViewModel : ViewModel() {
         if (row == -1 || col == -1) return
         if (currentState.grid[row][col].isFixed) return
 
-        if (notes == true) {
+        if (notes) {
             setNote(row, col, number)
         } else {
             val newGrid = currentState.grid.map { rowList ->
@@ -320,7 +329,7 @@ class SudokuViewModel : ViewModel() {
             isPaused = isPaused
         )
 
-        if (isPaused == true) {
+        if (isPaused) {
             stopTimer()
         } else {
             startTimer()

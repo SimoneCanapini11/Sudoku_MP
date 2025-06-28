@@ -45,7 +45,6 @@ fun Navigation() {
                 onNavigateToGame = { navigationViewModel.onNewGameClick() },
                 onNavigateToLoadGame = { navigationViewModel.onLoadGameClick() },
                 onNavigateToStats = { navigationViewModel.onStatsClick() },
-                onNavigateToSettings = { navigationViewModel.onSettingsClick() },
                 onExit = { navigationViewModel.onExitClick() }
             )
         }
