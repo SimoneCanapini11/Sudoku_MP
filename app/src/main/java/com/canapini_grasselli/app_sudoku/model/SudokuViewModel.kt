@@ -94,21 +94,25 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
 
     private fun checkSavedGame() {
         viewModelScope.launch {
-            _canLoadGame.value = repository.getLastSudokuGame() != null
+            val lastGame = repository.getLastSudokuGame()
+            _canLoadGame.value = lastGame != null && !lastGame.isCompleted
         }
     }
 
     fun saveGame() {
         viewModelScope.launch {
             val currentGame = _gameState.value
-            val gameEntity = SudokuGameMapper.fromDomain(currentGame)
-            repository.saveSudokuGame(gameEntity)
-            checkSavedGame()
+            if (!currentGame.isCompleted) {  // Salva solo se la partita non è completata
+                val gameEntity = SudokuGameMapper.fromDomain(currentGame)
+                repository.saveSudokuGame(gameEntity)
+            }
+            checkSavedGame()  // Aggiorna lo stato di canLoadGame dopo il salvataggio
         }
     }
 
     fun loadLastGame() {
         viewModelScope.launch {
+            stopTimer()
             val lastGame = repository.getLastSudokuGame()
             lastGame?.let {
                 val loadedGame = SudokuGameMapper.toDomain(it)
@@ -122,6 +126,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                     startTimer()
                 }
             }
+            checkSavedGame()
         }
     }
 
@@ -182,6 +187,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
 
     fun generateNewGame() {
         viewModelScope.launch {
+                stopTimer() // Ferma il timer esistente
                 val response = SudokuApiClient.service.getSudoku()
                 val apiGrid = response.newboard.grids.first()
                 val values = apiGrid.value
@@ -206,9 +212,11 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                     mistakes = 0,
                     difficulty = difficulty,
                     solution = solution,
-                    hintLeft = 3
+                    hintLeft = 3,
+                    timerSeconds = 0  // Reset timer
                 )
                 startTimer()
+                checkSavedGame()
         }
     }
 

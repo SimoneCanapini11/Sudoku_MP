@@ -30,7 +30,7 @@ fun Navigation(themeViewModel: ThemeViewModel, sudokuViewModel: SudokuViewModel)
                 navController.navigate("game")
             }
             NavigationViewModel.NavigationEvent.NavigateToLoadGame -> {
-                navController.navigate("load_game")
+                navController.navigate("game")
             }
             NavigationViewModel.NavigationEvent.NavigateToStats -> {
                 navController.navigate("stats")

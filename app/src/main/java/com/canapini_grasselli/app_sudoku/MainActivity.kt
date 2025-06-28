@@ -45,12 +45,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+//continue game: salvare partita anche quando l'app viene chiusa da tasto home + clear, warning gameRepository
+//Bug: quando premo pause, poi menu per uscire, la pausa va in play e il tempo scorre
 //Gestire evento partita terminata
-//Scegliere difficoltà
 //mantieni stato partita in background (?)
 //Inserire la possibilità di mettere in pausa e quando si riapre l'applicazione l'ultima partita messa in pausa viene ricaricata
-//Due modalità di gioco: 1)Libera il timer conta semplicemente il tempo a finire la partita 2)Sfida allo scadere del timer la partita termina con sconfitta
-//Appunti
 /*
 1.      Una interfaccia utente ben fatta!
 2.      Un database dei risultati precedenti
