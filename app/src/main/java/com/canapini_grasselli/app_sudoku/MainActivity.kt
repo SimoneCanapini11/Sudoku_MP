@@ -6,10 +6,14 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.canapini_grasselli.app_sudoku.di.AppViewModelProvider
+import com.canapini_grasselli.app_sudoku.model.SudokuViewModel
 import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
 import com.canapini_grasselli.app_sudoku.ui.theme.App_SudokuTheme
 import com.canapini_grasselli.app_sudoku.ui.navigation.Navigation
@@ -18,16 +22,23 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val themeViewModel: ThemeViewModel = viewModel()
-            val currentTheme by themeViewModel.currentTheme.collectAsState()
+            CompositionLocalProvider(
+                LocalViewModelStoreOwner provides this
+            ) {
+                val themeViewModel: ThemeViewModel = viewModel()
+                val currentTheme by themeViewModel.currentTheme.collectAsState()
+                val sudokuViewModel: SudokuViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
-            App_SudokuTheme ( appTheme = currentTheme)
-            {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Navigation(themeViewModel = themeViewModel)
+                App_SudokuTheme(appTheme = currentTheme)
+                {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        Navigation(
+                            sudokuViewModel = sudokuViewModel,
+                            themeViewModel = themeViewModel)
+                    }
                 }
             }
         }

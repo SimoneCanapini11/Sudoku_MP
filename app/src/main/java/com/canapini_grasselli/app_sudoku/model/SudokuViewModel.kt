@@ -1,8 +1,9 @@
 package com.canapini_grasselli.app_sudoku.model
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.canapini_grasselli.app_sudoku.data.local.GameRepository
+import com.canapini_grasselli.app_sudoku.data.local.SudokuGameMapper
 import com.canapini_grasselli.app_sudoku.data.remote.SudokuApiClient
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,10 +47,9 @@ enum class AppTheme {
 class NavigationViewModel : ViewModel() {
     // Eventi di navigazione
     sealed class NavigationEvent {
-        data object NavigateToGame : NavigationEvent()
+        data object NavigateToNewGame : NavigationEvent()
         data object NavigateToLoadGame : NavigationEvent()
         data object NavigateToStats : NavigationEvent()
-        data object NavigateToSettings : NavigationEvent()
         data object Exit : NavigationEvent()
     }
 
@@ -57,7 +57,7 @@ class NavigationViewModel : ViewModel() {
     val navigationEvent: StateFlow<NavigationEvent?> = _navigationEvent.asStateFlow()
 
     fun onNewGameClick() {
-        _navigationEvent.value = NavigationEvent.NavigateToGame
+        _navigationEvent.value = NavigationEvent.NavigateToNewGame
     }
 
     fun onLoadGameClick() {
@@ -78,14 +78,51 @@ class NavigationViewModel : ViewModel() {
     }
 }
 
-class SudokuViewModel : ViewModel() {
+class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
+
     private val _gameState = MutableStateFlow(SudokuGame())
     val gameState: StateFlow<SudokuGame> = _gameState.asStateFlow()
+    private var _canLoadGame = MutableStateFlow(false)
+    val canLoadGame: StateFlow<Boolean> = _canLoadGame.asStateFlow()
 
     private var timerJob: Job? = null
 
     init {
         generateNewGame()
+        checkSavedGame()
+    }
+
+    private fun checkSavedGame() {
+        viewModelScope.launch {
+            _canLoadGame.value = repository.getLastSudokuGame() != null
+        }
+    }
+
+    fun saveGame() {
+        viewModelScope.launch {
+            val currentGame = _gameState.value
+            val gameEntity = SudokuGameMapper.fromDomain(currentGame)
+            repository.saveSudokuGame(gameEntity)
+            checkSavedGame()
+        }
+    }
+
+    fun loadLastGame() {
+        viewModelScope.launch {
+            val lastGame = repository.getLastSudokuGame()
+            lastGame?.let {
+                val loadedGame = SudokuGameMapper.toDomain(it)
+                _gameState.value = loadedGame.copy(
+                    selectedRow = -1,
+                    selectedCol = -1,
+                    isPaused = false,
+                    isNotesActive = false
+                )
+                if (!loadedGame.isCompleted) {
+                    startTimer()
+                }
+            }
+        }
     }
 
     fun selectCell(row: Int, col: Int) {
@@ -143,9 +180,8 @@ class SudokuViewModel : ViewModel() {
         setNumber(0)
     }
 
-    private fun generateNewGame() {
+    fun generateNewGame() {
         viewModelScope.launch {
-            try {
                 val response = SudokuApiClient.service.getSudoku()
                 val apiGrid = response.newboard.grids.first()
                 val values = apiGrid.value
@@ -172,19 +208,10 @@ class SudokuViewModel : ViewModel() {
                     solution = solution,
                     hintLeft = 3
                 )
-
                 startTimer()
-
-            } catch (e: Exception) {
-                // Stampa il tipo di eccezione e il messaggio nel logcat
-                Log.e("SudokuViewModel", "Errore generazione sudoku", e)
-                // oppure, se vuoi solo il messaggio:
-                Log.e("SudokuViewModel", "Errore: ${e.javaClass.simpleName}: ${e.message}")
-                // oppure stampa direttamente lo stacktrace:
-                e.printStackTrace()
-            }
         }
     }
+
 
 
     private fun isValidMove(grid: List<List<SudokuCell>>, row: Int, col: Int, num: Int): Boolean {

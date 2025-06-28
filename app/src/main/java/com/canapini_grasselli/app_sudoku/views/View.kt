@@ -43,11 +43,13 @@ fun HomeScreen(
     onNavigateToLoadGame: () -> Unit,
     onNavigateToStats: () -> Unit,
     onExit: () -> Unit,
-    themeViewModel: ThemeViewModel //Per cambiare font
+    themeViewModel: ThemeViewModel, //Per cambiare font
+    viewModel: SudokuViewModel = viewModel()
 ) {
     var showExitDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
     val currentTheme by themeViewModel.currentTheme.collectAsState()
+    val canLoadGame by viewModel.canLoadGame.collectAsState()
 
     BackHandler {
         showExitDialog = true
@@ -305,9 +307,18 @@ fun HomeScreen(
                 onClick = onNavigateToLoadGame ,
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
-                    .height(56.dp)
+                    .height(56.dp),
+                enabled = canLoadGame, // Disabilita il bottone se non c'è partita salvata
+                colors = ButtonDefaults.buttonColors(
+                    disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                )
             ) {
-                Text(stringResource(R.string.cont_game), fontSize = 18.sp)
+                Text(stringResource(
+                    R.string.cont_game),
+                    fontSize = 18.sp,
+                     color = if (canLoadGame) MaterialTheme.colorScheme.onPrimary
+                     else MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
+                )
             }
 
             Button(
@@ -354,14 +365,10 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                     Button(
                         modifier = Modifier.width(120.dp), // Larghezza fissa per entrambi i bottoni
                         onClick = {
-                            // Salva la partita se necessario
-                            //---  viewModel.saveGameState()
-
-                            // Naviga alla home
+                            viewModel.saveGame() // Salva la partita
                             navController.navigate("home") {
                                 popUpTo("home") { inclusive = true }
                             }
-
                             showExitDialog = false
                         }
                     ) {

@@ -10,13 +10,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.canapini_grasselli.app_sudoku.model.NavigationViewModel
 import com.canapini_grasselli.app_sudoku.model.StatisticsViewModel
+import com.canapini_grasselli.app_sudoku.model.SudokuViewModel
 import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
 import com.canapini_grasselli.app_sudoku.views.HomeScreen
 import com.canapini_grasselli.app_sudoku.views.StatisticsScreen
 import com.canapini_grasselli.app_sudoku.views.SudokuScreen
 
 @Composable
-fun Navigation(themeViewModel: ThemeViewModel) {
+fun Navigation(themeViewModel: ThemeViewModel, sudokuViewModel: SudokuViewModel) {
     val navController = rememberNavController()
     val navigationViewModel: NavigationViewModel = viewModel()
     val navigationEvent by navigationViewModel.navigationEvent.collectAsState()
@@ -25,7 +26,7 @@ fun Navigation(themeViewModel: ThemeViewModel) {
     // Gestione degli eventi di navigazione
     navigationEvent?.let { event ->
         when (event) {
-            NavigationViewModel.NavigationEvent.NavigateToGame -> {
+            NavigationViewModel.NavigationEvent.NavigateToNewGame -> {
                 navController.navigate("game")
             }
             NavigationViewModel.NavigationEvent.NavigateToLoadGame -> {
@@ -33,9 +34,6 @@ fun Navigation(themeViewModel: ThemeViewModel) {
             }
             NavigationViewModel.NavigationEvent.NavigateToStats -> {
                 navController.navigate("stats")
-            }
-            NavigationViewModel.NavigationEvent.NavigateToSettings -> {
-                navController.navigate("settings")
             }
             NavigationViewModel.NavigationEvent.Exit -> {
                 Process.killProcess(Process.myPid())
@@ -47,15 +45,24 @@ fun Navigation(themeViewModel: ThemeViewModel) {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
             HomeScreen(
-                onNavigateToGame = { navigationViewModel.onNewGameClick() },
-                onNavigateToLoadGame = { navigationViewModel.onLoadGameClick() },
+                onNavigateToGame = {
+                    sudokuViewModel.generateNewGame()
+                    navigationViewModel.onNewGameClick() },
+                onNavigateToLoadGame = {
+                    sudokuViewModel.loadLastGame()
+                    navigationViewModel.onLoadGameClick()
+                },
                 onNavigateToStats = { navigationViewModel.onStatsClick() },
                 onExit = { navigationViewModel.onExitClick() },
-                themeViewModel = themeViewModel  //Passa il themeViewModel alla HomeScreen
+                themeViewModel = themeViewModel,  //Passa il themeViewModel alla HomeScreen
+                viewModel = sudokuViewModel
             )
         }
         composable("game") {
-            SudokuScreen(navController = navController)
+            SudokuScreen(
+                viewModel = sudokuViewModel,
+                navController = navController
+                )
         }
 
         composable("stats") {
@@ -64,6 +71,5 @@ fun Navigation(themeViewModel: ThemeViewModel) {
                 statisticsViewModel = statisticsViewModel
             )
         }
-        // -----Altri composable per le altre schermate verranno aggiunti qui
     }
 }
