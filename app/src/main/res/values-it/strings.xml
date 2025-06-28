@@ -22,4 +22,12 @@
     <string name="purple_theme">Tema Viola</string>
     <string name="green_theme">Tema Verde</string>
     <string name="blue_theme">Tema Blu</string>
+    <string name="general_statistics">Statistiche Generali</string>
+    <string name="games_played">Partite Giocate</string>
+    <string name="games_won">Partite Vinte</string>
+    <string name="games_completed">Partite Completate</string>
+    <string name="best_times">Migliori Tempi</string>
+    <string name="easy_difficulty">Facile</string>
+    <string name="medium_difficulty">Medio</string>
+    <string name="hard_difficulty">Difficile</string>
 </resources>

@@ -9,8 +9,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.canapini_grasselli.app_sudoku.model.NavigationViewModel
+import com.canapini_grasselli.app_sudoku.model.StatisticsViewModel
 import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
 import com.canapini_grasselli.app_sudoku.views.HomeScreen
+import com.canapini_grasselli.app_sudoku.views.StatisticsScreen
 import com.canapini_grasselli.app_sudoku.views.SudokuScreen
 
 @Composable
@@ -18,6 +20,7 @@ fun Navigation(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
     val navigationViewModel: NavigationViewModel = viewModel()
     val navigationEvent by navigationViewModel.navigationEvent.collectAsState()
+    val statisticsViewModel: StatisticsViewModel = viewModel()
 
     // Gestione degli eventi di navigazione
     navigationEvent?.let { event ->
@@ -53,6 +56,13 @@ fun Navigation(themeViewModel: ThemeViewModel) {
         }
         composable("game") {
             SudokuScreen(navController = navController)
+        }
+
+        composable("stats") {
+            StatisticsScreen(
+                onNavigateBack = { navController.navigateUp() },
+                statisticsViewModel = statisticsViewModel
+            )
         }
         // -----Altri composable per le altre schermate verranno aggiunti qui
     }

@@ -24,4 +24,12 @@
     <string name="purple_theme">Purple Theme</string>
     <string name="green_theme">Green Theme</string>
     <string name="blue_theme">Blue Theme</string>
+    <string name="general_statistics">General Statistics</string>
+    <string name="games_played">Matches Played</string>
+    <string name="games_won">Matches Won</string>
+    <string name="games_completed">Matches Completed</string>
+    <string name="best_times">Best Times</string>
+    <string name="easy_difficulty">Easy</string>
+    <string name="medium_difficulty">Medium</string>
+    <string name="hard_difficulty">Hard</string>
 </resources>

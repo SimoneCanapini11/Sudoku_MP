@@ -22,10 +22,13 @@ import com.canapini_grasselli.app_sudoku.model.SudokuCell
 import com.canapini_grasselli.app_sudoku.model.SudokuGame
 import com.canapini_grasselli.app_sudoku.model.SudokuViewModel
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.canapini_grasselli.app_sudoku.model.AppTheme
+import com.canapini_grasselli.app_sudoku.model.StatisticsViewModel
 import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
 import com.canapini_grasselli.app_sudoku.ui.theme.Blue40
 import com.canapini_grasselli.app_sudoku.ui.theme.Green40
@@ -86,7 +89,8 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             stringResource(R.string.purple_theme),
-                            fontSize = 18.sp)
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Medium)
                     }
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -125,7 +129,8 @@ fun HomeScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 stringResource(R.string.green_theme),
-                                 fontSize = 18.sp)
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Medium)
                         }
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -163,7 +168,8 @@ fun HomeScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 stringResource(R.string.blue_theme),
-                                fontSize = 18.sp)
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Medium)
                         }
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -792,6 +798,135 @@ fun ActionButton(
         )
     }
 }
+
+@Composable
+fun StatisticsScreen(
+    onNavigateBack: () -> Unit,
+    statisticsViewModel: StatisticsViewModel = viewModel()
+) {
+    val statistics by statisticsViewModel.statistics.collectAsState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+            .verticalScroll(rememberScrollState()),
+    ) {
+        // Header con bottone indietro
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 50.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onNavigateBack) {
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_arrow_back),
+                    contentDescription = "Back_to_home",
+                    modifier = Modifier.size(35.dp)
+                )
+            }
+            Text(
+                text = stringResource(R.string.statistics),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                fontSize = 35.sp
+            )
+            // Spazio vuoto per centrare il titolo
+            Spacer(modifier = Modifier.width(48.dp))
+        }
+
+        // Statistiche generali
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.general_statistics),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                StatisticRow(
+                    label = stringResource(R.string.games_played),
+                    value = statistics.gamesPlayed.toString()
+                )
+                StatisticRow(
+                    label = stringResource(R.string.games_won),
+                    value = statistics.gamesWon.toString()
+                )
+                StatisticRow(
+                    label = stringResource(R.string.games_completed),
+                    value = statistics.gamesCompleted.toString()
+                )
+            }
+        }
+
+        // Migliori tempi
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.best_times),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                StatisticRow(
+                    label = stringResource(R.string.easy_difficulty),
+                    value = statistics.bestTimeEasy.toTimeString()
+                )
+                StatisticRow(
+                    label = stringResource(R.string.medium_difficulty),
+                    value = statistics.bestTimeMedium.toTimeString()
+                )
+                StatisticRow(
+                    label = stringResource(R.string.hard_difficulty),
+                    value = statistics.bestTimeHard.toTimeString()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatisticRow(
+    label: String,
+    value: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
 
 // Funzione helper
 private fun isInSameBox(row1: Int, col1: Int, row2: Int, col2: Int): Boolean {
