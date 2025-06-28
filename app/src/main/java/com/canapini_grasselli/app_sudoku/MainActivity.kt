@@ -35,7 +35,6 @@ class MainActivity : ComponentActivity() {
 }
 
 //Scegliere difficoltà
-//Cambiare i font
 //landscape
 //mantieni stato partita in background
 //Inserire la possibilità di mettere in pausa e quando si riapre l'applicazione l'ultima partita messa in pausa viene ricaricata

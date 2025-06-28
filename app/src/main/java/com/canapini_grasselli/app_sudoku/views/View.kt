@@ -1,5 +1,6 @@
 package com.canapini_grasselli.app_sudoku.views
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,6 +48,10 @@ fun HomeScreen(
     var showExitDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
     val currentTheme by themeViewModel.currentTheme.collectAsState()
+
+    BackHandler {
+        showExitDialog = true
+    }
 
     // Selezione del font
     if (showThemeDialog) {
@@ -324,12 +329,22 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
     val gameState by viewModel.gameState.collectAsState()
     var showExitDialog by remember { mutableStateOf(false) }
 
+    BackHandler {
+        // Quando viene premuto il tasto back, mostra il dialog
+        showExitDialog = true
+        viewModel.togglePause()
+    }
+
     // Mostra il dialogo di conferma se showExitDialog è true
     if (showExitDialog) {
         AlertDialog(
-            onDismissRequest = {  },
+            onDismissRequest = {
+                showExitDialog = false
+                viewModel.togglePause()  // Riprendi il gioco se l'utente tocca fuori dal dialog
+            },
             title = { Text(stringResource(R.string.return_to_menu),
-                            fontWeight = FontWeight.Bold) },
+                            fontWeight = FontWeight.Bold)
+                    },
             text = { Text(stringResource(R.string.current_game_saved)) },
             confirmButton = {
                 Row(
