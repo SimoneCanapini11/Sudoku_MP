@@ -27,6 +27,21 @@ private val PurpleDarkColorScheme = darkColorScheme(
     secondaryContainer = Color(0xFF85C1E9)
 )
 
+private val GreenDarkColorScheme = darkColorScheme(
+    primary = Green40,
+    onPrimary = Color.Black,
+    secondary = Green80,
+    onSecondary = Color.Black,
+    tertiary = Green80,
+    onTertiary = Color.Black,
+    background = Color(0xFF121212),
+    onBackground = Color.White,
+    surface = Color(0xFF121212),
+    primaryContainer = Green80,
+    onSurface = Color.White,
+    secondaryContainer = Green80
+)
+
 private val PurpleLightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
@@ -37,25 +52,15 @@ private val PurpleLightColorScheme = lightColorScheme(
     onSecondary = Color.White,
     onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F)
-)
-
-private val GreenDarkColorScheme = darkColorScheme(
-    primary = Green80,
-    onPrimary = Color.Black,
-    secondary = Green80,
-    onSecondary = Color.Black,
-    tertiary = Green80,
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F)
+    onSurface = Color(0xFF1C1B1F),
+    primaryContainer = Purple40,
+    onPrimaryContainer = Color.White,
+    secondaryContainer = PurpleGrey40
 )
 
 private val GreenLightColorScheme = lightColorScheme(
     primary = Green40,
-    secondary = Green40,
+    secondary = Green80,
     tertiary = Green40,
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
@@ -63,7 +68,10 @@ private val GreenLightColorScheme = lightColorScheme(
     onSecondary = Color.White,
     onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F)
+    onSurface = Color(0xFF1C1B1F),
+    primaryContainer = Green40,
+    onPrimaryContainer = Color.White,
+    secondaryContainer = Green40
 )
 
 @Composable

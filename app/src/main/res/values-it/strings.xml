@@ -18,4 +18,7 @@
     <string name="cancel">Annulla</string>
     <string name="exit_app">Uscire dall\\\'applicazione?</string>
     <string name="confirm_exit_message">Sei sicuro di voler uscire dall\\\'applicazione?</string>
+    <string name="theme_selection">Seleziona il tema</string>
+    <string name="purple_theme">Tema Viola</string>
+    <string name="green_theme">Tema Verde</string>
 </resources>

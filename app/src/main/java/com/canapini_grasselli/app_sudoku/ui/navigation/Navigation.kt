@@ -1,5 +1,6 @@
 package com.canapini_grasselli.app_sudoku.ui.navigation
 
+import android.os.Process
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -8,11 +9,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.canapini_grasselli.app_sudoku.model.NavigationViewModel
+import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
 import com.canapini_grasselli.app_sudoku.views.HomeScreen
 import com.canapini_grasselli.app_sudoku.views.SudokuScreen
 
 @Composable
-fun Navigation() {
+fun Navigation(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
     val navigationViewModel: NavigationViewModel = viewModel()
     val navigationEvent by navigationViewModel.navigationEvent.collectAsState()
@@ -33,7 +35,7 @@ fun Navigation() {
                 navController.navigate("settings")
             }
             NavigationViewModel.NavigationEvent.Exit -> {
-                android.os.Process.killProcess(android.os.Process.myPid())
+                Process.killProcess(Process.myPid())
             }
         }
         navigationViewModel.onNavigationEventHandled()
@@ -45,7 +47,8 @@ fun Navigation() {
                 onNavigateToGame = { navigationViewModel.onNewGameClick() },
                 onNavigateToLoadGame = { navigationViewModel.onLoadGameClick() },
                 onNavigateToStats = { navigationViewModel.onStatsClick() },
-                onExit = { navigationViewModel.onExitClick() }
+                onExit = { navigationViewModel.onExitClick() },
+                themeViewModel = themeViewModel  //Passa il themeViewModel alla HomeScreen
             )
         }
         composable("game") {

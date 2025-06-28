@@ -38,7 +38,7 @@ fun HomeScreen(
     onNavigateToLoadGame: () -> Unit,
     onNavigateToStats: () -> Unit,
     onExit: () -> Unit,
-    themeViewModel: ThemeViewModel = viewModel() //Per cambiare font
+    themeViewModel: ThemeViewModel //Per cambiare font
 ) {
     var showExitDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
@@ -50,34 +50,92 @@ fun HomeScreen(
             onDismissRequest = { showThemeDialog = false },
             title = {
                 Text(
-                    "Seleziona il tema",
+                    stringResource(R.string.theme_selection),
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
                 Column {
-                    ThemeOption(
-                        text = "Tema Viola",
-                        selected = currentTheme == AppTheme.PURPLE,
-                        color = Purple40
+                    //Tema viola
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                themeViewModel.setTheme(AppTheme.PURPLE)
+                                showThemeDialog = false
+                            }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        themeViewModel.setTheme(AppTheme.PURPLE)
-                        showThemeDialog = false
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                        RadioButton(
+                            selected = currentTheme == AppTheme.PURPLE,
+                            onClick = {
+                                themeViewModel.setTheme(AppTheme.PURPLE)
+                                showThemeDialog = false
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            stringResource(R.string.purple_theme),
+                            fontSize = 17.sp)
+                    }
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .background(Purple40, CircleShape)
+                                    .border(1.dp, Color.Gray, CircleShape)
+                            )
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    ThemeOption(
-                        text = "Tema Verde",
-                        selected = currentTheme == AppTheme.GREEN,
-                        color = Green40
+                    //Tema verde
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                themeViewModel.setTheme(AppTheme.GREEN)
+                                showThemeDialog = false
+                            }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        themeViewModel.setTheme(AppTheme.GREEN)
-                        showThemeDialog = false
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = currentTheme == AppTheme.GREEN,
+                                onClick = {
+                                    themeViewModel.setTheme(AppTheme.GREEN)
+                                    showThemeDialog = false
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                stringResource(R.string.green_theme),
+                                 fontSize = 17.sp)
+                        }
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .background(Green40, CircleShape)
+                                    .border(1.dp, Color.Gray, CircleShape)
+                            )
+                        }
                     }
                 }
             },
-            confirmButton = {}
+            confirmButton = { }
         )
     }
 
@@ -628,7 +686,6 @@ fun ActionButton(
     badgeText: String? = null,
     enabled: Boolean = true
 ) {
-    //val backgroundColor = if (isActive) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
     val backgroundColor = when {
         !enabled ->  MaterialTheme.colorScheme.secondary // Cambia colore se disabilitato
         isActive -> MaterialTheme.colorScheme.secondary
@@ -689,36 +746,6 @@ fun ActionButton(
             text = label,
             fontSize = 12.sp,
             color = textColor
-        )
-    }
-}
-
-
-@Composable
-private fun ThemeOption(
-    text: String,
-    selected: Boolean,
-    color: Color,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = selected,
-            onClick = onClick
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text)
-        Spacer(modifier = Modifier.width(8.dp))
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .background(color = color, shape = CircleShape)
         )
     }
 }

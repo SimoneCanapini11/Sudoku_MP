@@ -20,4 +20,7 @@
     <string name="cancel">Cancel</string>
     <string name="exit_app">Exit the application?</string>
     <string name="confirm_exit_message">Are you sure you want to exit the application?</string>
+    <string name="theme_selection">Select theme</string>
+    <string name="purple_theme">Purple Theme</string>
+    <string name="green_theme">Green Theme</string>
 </resources>
