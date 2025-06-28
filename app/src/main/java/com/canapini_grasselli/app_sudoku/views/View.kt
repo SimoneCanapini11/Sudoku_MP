@@ -824,6 +824,7 @@ fun StatisticsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
             .verticalScroll(rememberScrollState()),
     ) {
@@ -835,10 +836,19 @@ fun StatisticsScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onNavigateBack) {
+            IconButton(
+                onClick = onNavigateBack,
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        shape = CircleShape
+                    )
+                    .padding(4.dp)
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_arrow_back),
                     contentDescription = "Back_to_home",
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(35.dp)
                 )
             }
@@ -846,6 +856,7 @@ fun StatisticsScreen(
                 text = stringResource(R.string.statistics),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 35.sp
             )
             // Spazio vuoto per centrare il titolo
@@ -853,75 +864,101 @@ fun StatisticsScreen(
         }
 
         // Statistiche generali
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.general_statistics),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                StatisticRow(
+        StatisticsCard(
+            title = stringResource(R.string.general_statistics),
+            icon = R.drawable.icon_stats,
+            content = {
+                StatisticItem(
                     label = stringResource(R.string.games_played),
-                    value = statistics.gamesPlayed.toString()
+                    value = statistics.gamesPlayed.toString(),
+                    icon = R.drawable.icon_games_played
                 )
-                StatisticRow(
+                StatisticItem(
                     label = stringResource(R.string.games_won),
-                    value = statistics.gamesWon.toString()
+                    value = statistics.gamesWon.toString(),
+                    icon = R.drawable.icon_trophy
                 )
-                StatisticRow(
+                StatisticItem(
                     label = stringResource(R.string.games_completed),
-                    value = statistics.gamesCompleted.toString()
+                    value = statistics.gamesCompleted.toString(),
+                    icon = R.drawable.icon_check_circle
                 )
             }
-        }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Migliori tempi
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.best_times),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 16.dp)
+        StatisticsCard(
+            title = stringResource(R.string.best_times),
+            icon = R.drawable.icon_timer,
+            content = {
+                DifficultyTimeItem(
+                    difficulty = stringResource(R.string.easy_difficulty),
+                    time = statistics.bestTimeEasy.toTimeString(),
+                    color = Color(0xFF4CAF50)
                 )
-                StatisticRow(
-                    label = stringResource(R.string.easy_difficulty),
-                    value = statistics.bestTimeEasy.toTimeString()
+                DifficultyTimeItem(
+                    difficulty = stringResource(R.string.medium_difficulty),
+                    time = statistics.bestTimeMedium.toTimeString(),
+                    color = Color(0xFFFFA000)
                 )
-                StatisticRow(
-                    label = stringResource(R.string.medium_difficulty),
-                    value = statistics.bestTimeMedium.toTimeString()
-                )
-                StatisticRow(
-                    label = stringResource(R.string.hard_difficulty),
-                    value = statistics.bestTimeHard.toTimeString()
+                DifficultyTimeItem(
+                    difficulty = stringResource(R.string.hard_difficulty),
+                    time = statistics.bestTimeHard.toTimeString(),
+                    color = Color(0xFFE53935)
                 )
             }
+        )
+    }
+}
+
+@Composable
+private fun StatisticsCard(
+    title: String,
+    icon: Int,
+    content: @Composable () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = icon),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            content()
         }
     }
 }
 
 @Composable
-private fun StatisticRow(
+private fun StatisticItem(
     label: String,
-    value: String
+    value: String,
+    icon: Int
 ) {
     Row(
         modifier = Modifier
@@ -930,14 +967,69 @@ private fun StatisticRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+@Composable
+private fun DifficultyTimeItem(
+    difficulty: String,
+    time: String,
+    color: Color
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .border(
+                width = 2.dp,
+                color = color.copy(alpha = 0.2f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .background(color, CircleShape)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = difficulty,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
+        }
+        Text(
+            text = time,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            color = color
         )
     }
 }
