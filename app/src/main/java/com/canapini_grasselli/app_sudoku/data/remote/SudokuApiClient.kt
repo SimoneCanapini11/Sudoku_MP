@@ -1,4 +1,5 @@
-import com.canapini_grasselli.app_sudoku.data.remote.SudokuAPI
+package com.canapini_grasselli.app_sudoku.data.remote
+
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

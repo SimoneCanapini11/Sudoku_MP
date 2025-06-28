@@ -3,6 +3,7 @@ package com.canapini_grasselli.app_sudoku.model
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.canapini_grasselli.app_sudoku.data.remote.SudokuApiClient
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -378,6 +379,4 @@ class SudokuViewModel : ViewModel() {
         super.onCleared()
         timerJob?.cancel()
     }
-
-    
 }
