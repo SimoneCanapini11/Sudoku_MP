@@ -23,7 +23,8 @@ class ThemeViewModel : ViewModel() {
 
 enum class AppTheme {
     PURPLE,
-    GREEN
+    GREEN,
+    BLUE
 }
 
 class NavigationViewModel : ViewModel() {

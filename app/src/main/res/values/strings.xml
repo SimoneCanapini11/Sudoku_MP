@@ -23,4 +23,5 @@
     <string name="theme_selection">Select theme</string>
     <string name="purple_theme">Purple Theme</string>
     <string name="green_theme">Green Theme</string>
+    <string name="blue_theme">Blue Theme</string>
 </resources>

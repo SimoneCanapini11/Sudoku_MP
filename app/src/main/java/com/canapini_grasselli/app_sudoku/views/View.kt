@@ -27,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.canapini_grasselli.app_sudoku.model.AppTheme
 import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
+import com.canapini_grasselli.app_sudoku.ui.theme.Blue40
 import com.canapini_grasselli.app_sudoku.ui.theme.Green40
 import com.canapini_grasselli.app_sudoku.ui.theme.Purple40
 import java.util.Locale
@@ -51,11 +52,15 @@ fun HomeScreen(
             title = {
                 Text(
                     stringResource(R.string.theme_selection),
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 26.sp
                 )
             },
             text = {
-                Column {
+                Column (modifier = Modifier.fillMaxWidth()) {
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     //Tema viola
                     Row(
                         modifier = Modifier
@@ -81,7 +86,7 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             stringResource(R.string.purple_theme),
-                            fontSize = 17.sp)
+                            fontSize = 18.sp)
                     }
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -120,7 +125,7 @@ fun HomeScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 stringResource(R.string.green_theme),
-                                 fontSize = 17.sp)
+                                 fontSize = 18.sp)
                         }
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -129,6 +134,44 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .size(28.dp)
                                     .background(Green40, CircleShape)
+                                    .border(1.dp, Color.Gray, CircleShape)
+                            )
+                        }
+                    }
+                    //Tema blu
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                themeViewModel.setTheme(AppTheme.BLUE)
+                                showThemeDialog = false
+                            }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = currentTheme == AppTheme.BLUE,
+                                onClick = {
+                                    themeViewModel.setTheme(AppTheme.BLUE)
+                                    showThemeDialog = false
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                stringResource(R.string.blue_theme),
+                                fontSize = 18.sp)
+                        }
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .background(Blue40, CircleShape)
                                     .border(1.dp, Color.Gray, CircleShape)
                             )
                         }

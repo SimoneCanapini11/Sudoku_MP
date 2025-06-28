@@ -14,64 +14,62 @@ import com.canapini_grasselli.app_sudoku.model.AppTheme
 
 private val PurpleDarkColorScheme = darkColorScheme(
     primary = Purple80,
-    onPrimary = Color.Black,
     secondary = PurpleGrey80,
-    onSecondary = Color.Black,
-    tertiary = Pink80,
-    onTertiary = Color.Black,
     background = Color(0xFF121212),
-    onBackground = Color.White,
     surface = Color(0xFF121212),
-    primaryContainer = Color(0xFF4D3D7F),
-    onSurface = Color.White,
-    secondaryContainer = Color(0xFF85C1E9)
+    onPrimary = Color.Black,
+    onBackground = Color.White,
+    onSurface = Color.White
 )
 
 private val GreenDarkColorScheme = darkColorScheme(
     primary = Green40,
-    onPrimary = Color.Black,
     secondary = Green80,
-    onSecondary = Color.Black,
-    tertiary = Green80,
-    onTertiary = Color.Black,
     background = Color(0xFF121212),
-    onBackground = Color.White,
     surface = Color(0xFF121212),
-    primaryContainer = Green80,
-    onSurface = Color.White,
-    secondaryContainer = Green80
+    onPrimary = Color.Black,
+    onBackground = Color.White,
+    onSurface = Color.White
+)
+
+private val BlueDarkColorScheme = darkColorScheme(
+    primary = Blue40,
+    secondary = PurpleGrey80,
+    background = Color(0xFF121212),
+    surface = Color(0xFF121212),
+    onPrimary = Color.Black,
+    onBackground = Color.White,
+    onSurface = Color.White
 )
 
 private val PurpleLightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
-    tertiary = Pink40,
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
     onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    primaryContainer = Purple40,
-    onPrimaryContainer = Color.White,
-    secondaryContainer = PurpleGrey40
+    onSurface = Color(0xFF1C1B1F)
 )
 
 private val GreenLightColorScheme = lightColorScheme(
     primary = Green40,
     secondary = Green80,
-    tertiary = Green40,
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
     onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    primaryContainer = Green40,
-    onPrimaryContainer = Color.White,
-    secondaryContainer = Green40
+    onSurface = Color(0xFF1C1B1F)
+)
+
+private val BlueLightColorScheme = lightColorScheme(
+    primary = Blue40,
+    secondary = Blue80,
+    background = Color(0xFFFFFBFE),
+    surface = Color(0xFFFFFBFE),
+    onPrimary = Color.White,
+    onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F)
 )
 
 @Composable
@@ -90,10 +88,12 @@ fun App_SudokuTheme(
         darkTheme -> when (appTheme) {
             AppTheme.PURPLE -> PurpleDarkColorScheme
             AppTheme.GREEN -> GreenDarkColorScheme
+            AppTheme.BLUE -> BlueDarkColorScheme
         }
         else -> when (appTheme) {
             AppTheme.PURPLE -> PurpleLightColorScheme
             AppTheme.GREEN -> GreenLightColorScheme
+            AppTheme.BLUE -> BlueLightColorScheme
         }
     }
 
