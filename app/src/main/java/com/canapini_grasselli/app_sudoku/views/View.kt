@@ -35,6 +35,47 @@ fun HomeScreen(
     onNavigateToSettings: () -> Unit,
     onExit: () -> Unit
 ) {
+    var showExitDialog by remember { mutableStateOf(false) }
+
+    // Aggiungi l'AlertDialog
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = {
+                Text(
+                    stringResource(R.string.exit_app),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(stringResource(R.string.confirm_exit_message))
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        modifier = Modifier.width(120.dp),
+                        onClick = {
+                            onExit()
+                            showExitDialog = false
+                        }
+                    ) {
+                        Text(stringResource(R.string.confirm))
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Button(
+                        modifier = Modifier.width(120.dp),
+                        onClick = { showExitDialog = false }
+                    ) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            }
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -49,7 +90,7 @@ fun HomeScreen(
         ) {
             // Bottone Esci
             IconButton(
-                onClick = onExit
+                onClick = { showExitDialog = true }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_exit_to_app),
