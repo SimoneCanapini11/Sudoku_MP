@@ -35,7 +35,6 @@ class MainActivity : ComponentActivity() {
 }
 
 //Scegliere difficoltà
-//landscape
 //mantieni stato partita in background
 //Inserire la possibilità di mettere in pausa e quando si riapre l'applicazione l'ultima partita messa in pausa viene ricaricata
 //Due modalità di gioco: 1)Libera il timer conta semplicemente il tempo a finire la partita 2)Sfida allo scadere del timer la partita termina con sconfitta

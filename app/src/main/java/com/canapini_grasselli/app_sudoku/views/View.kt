@@ -868,6 +868,7 @@ fun StatisticsScreen(
             title = stringResource(R.string.general_statistics),
             icon = R.drawable.icon_stats,
             content = {
+                // Statistiche partite con dimensioni maggiori
                 StatisticItem(
                     label = stringResource(R.string.games_played),
                     value = statistics.gamesPlayed.toString(),
@@ -878,6 +879,7 @@ fun StatisticsScreen(
                     value = statistics.gamesWon.toString(),
                     icon = R.drawable.icon_trophy
                 )
+                // Statistiche completate normali
                 StatisticItem(
                     label = stringResource(R.string.games_completed),
                     value = statistics.gamesCompleted.toString(),
@@ -963,7 +965,7 @@ private fun StatisticItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -974,17 +976,19 @@ private fun StatisticItem(
                 painter = painterResource(id = icon),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(28.dp)
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodyLarge
+                fontSize = 19.sp,
+                style = MaterialTheme.typography.titleLarge
             )
         }
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyLarge,
+            fontSize = 24.sp,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
