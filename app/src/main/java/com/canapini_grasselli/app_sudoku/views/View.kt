@@ -411,35 +411,38 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
             modifier = Modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                contentAlignment = Alignment.Center
+                //horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 if (gameState.isCompleted) {
-                    //Utilizzo la box per allineare al centro il testo
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
                         Text(
                             text = stringResource(R.string.game_completed_you_win),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         )
-                    }
-                } else { //-----------Se si termina la partita e dopo si cancella uno dei numeri inseriti la partita continua
-                    Text(
-                        text = stringResource(R.string.errors, gameState.mistakes),
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(R.string.errors, gameState.mistakes),
+                            style = MaterialTheme.typography.titleMedium
+                        )
 
-                    Text(
-                        text = stringResource(R.string.timer, gameState.timerSeconds.toTimeString()),
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                        Text(
+                            text = stringResource(
+                                R.string.timer,
+                                gameState.timerSeconds.toTimeString()
+                            ),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
                 }
             }
         }
@@ -461,7 +464,6 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                 onClearClick = { viewModel.clearCell() }
             )
         }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         Card(
@@ -474,19 +476,20 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                if (!gameState.isCompleted) {
-                    Text(
-                        text = stringResource(R.string.hints_left, gameState.hintLeft),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
+                Text(
+                    text = if (gameState.isCompleted)
+                        stringResource(R.string.completion_time, gameState.timerSeconds.toTimeString())
+                    else
+                        stringResource(R.string.hints_left, gameState.hintLeft),
+                    style = MaterialTheme.typography.titleMedium
+                )
+
                 Text(
                     text = stringResource(
                         R.string.difficulty,
                         gameState.difficulty.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(
-                                Locale.ROOT
-                            ) else it.toString()
+                            if (it.isLowerCase()) it.titlecase(Locale.ROOT)
+                            else it.toString()
                         }
                     ),
                     style = MaterialTheme.typography.titleMedium
@@ -494,7 +497,11 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        if (gameState.isCompleted) {
+            Spacer(modifier = Modifier.weight(1f))
+        } else {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         //Menu di bottoni
         BottomActionBar(
