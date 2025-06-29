@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
 }
 
 //--vedere se funziona migrazione dati su un nuovo dispositivo
-//Bug: quando premo pause, poi menu per uscire, la pausa va in play e il tempo scorre
+//Mantenere colore scelto
 //Gestire evento partita terminata
 //mantieni stato partita in background (?)
 //Inserire la possibilità di mettere in pausa e quando si riapre l'applicazione l'ultima partita messa in pausa viene ricaricata

@@ -339,11 +339,15 @@ fun HomeScreen(
 fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavController) {
     val gameState by viewModel.gameState.collectAsState()
     var showExitDialog by remember { mutableStateOf(false) }
+    var wasPaused by remember { mutableStateOf(false) }
 
     BackHandler {
         // Quando viene premuto il tasto back, mostra il dialog
+        wasPaused = gameState.isPaused  // Salva lo stato corrente
         showExitDialog = true
-        viewModel.togglePause()
+        if (!gameState.isPaused) {  // Metti in pausa solo se non lo era già
+            viewModel.togglePause()
+        }
     }
 
     // Mostra il dialogo di conferma se showExitDialog è true
@@ -351,7 +355,9 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
         AlertDialog(
             onDismissRequest = {
                 showExitDialog = false
-                viewModel.togglePause()  // Riprendi il gioco se l'utente tocca fuori dal dialog
+                if (!wasPaused) {
+                    viewModel.togglePause()
+                }
             },
             title = { Text(stringResource(R.string.return_to_menu),
                             fontWeight = FontWeight.Bold)
@@ -377,8 +383,11 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                     Spacer(modifier = Modifier.width(16.dp)) // Spazio tra i bottoni
                     Button(
                         modifier = Modifier.width(120.dp), // Stessa larghezza del bottone Conferma
-                        onClick = { showExitDialog = false
-                                    viewModel.togglePause()
+                        onClick = {
+                            showExitDialog = false
+                            if (!wasPaused) {
+                                viewModel.togglePause()
+                            }
                         }
                     ) {
                         Text(stringResource(R.string.cancel))
@@ -490,8 +499,12 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
             hintCount = gameState.hintLeft,
             onPause = { viewModel.togglePause() },
             isPaused = gameState.isPaused,
-            onMenu = { showExitDialog = true
-                       viewModel.togglePause() //Mette il gioco in pausa
+            onMenu = {
+                wasPaused = gameState.isPaused  // Salva lo stato corrente
+                showExitDialog = true
+                if (!gameState.isPaused) {
+                    viewModel.togglePause()
+                }
             }
         )
     }
