@@ -214,19 +214,20 @@ fun HomeScreen(
                 ) {
                     Button(
                         modifier = Modifier.width(120.dp),
+                        onClick = { showExitDialog = false }
+                    ) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Button(
+                        modifier = Modifier.width(120.dp),
                         onClick = {
                             onExit()
                             showExitDialog = false
                         }
                     ) {
                         Text(stringResource(R.string.confirm))
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(
-                        modifier = Modifier.width(120.dp),
-                        onClick = { showExitDialog = false }
-                    ) {
-                        Text(stringResource(R.string.cancel))
                     }
                 }
             }
@@ -369,6 +370,19 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
+                        modifier = Modifier.width(120.dp), // Stessa larghezza del bottone Conferma
+                        onClick = {
+                            showExitDialog = false
+                            if (!wasPaused) {
+                                viewModel.togglePause()
+                            }
+                        }
+                    ) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                    Spacer(modifier = Modifier.width(16.dp)) // Spazio tra i bottoni
+
+                    Button(
                         modifier = Modifier.width(120.dp), // Larghezza fissa per entrambi i bottoni
                         onClick = {
                             viewModel.saveGame() // Salva la partita
@@ -379,18 +393,6 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                         }
                     ) {
                         Text(stringResource(R.string.confirm))
-                    }
-                    Spacer(modifier = Modifier.width(16.dp)) // Spazio tra i bottoni
-                    Button(
-                        modifier = Modifier.width(120.dp), // Stessa larghezza del bottone Conferma
-                        onClick = {
-                            showExitDialog = false
-                            if (!wasPaused) {
-                                viewModel.togglePause()
-                            }
-                        }
-                    ) {
-                        Text(stringResource(R.string.cancel))
                     }
                 }
             }
