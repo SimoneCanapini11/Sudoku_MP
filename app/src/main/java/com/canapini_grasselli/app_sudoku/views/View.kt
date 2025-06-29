@@ -498,7 +498,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
         }
 
         if (gameState.isCompleted) {
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(26.dp))
         } else {
             Spacer(modifier = Modifier.height(16.dp))
         }
