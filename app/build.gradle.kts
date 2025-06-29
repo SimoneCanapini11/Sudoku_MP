@@ -50,6 +50,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose.v270)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation (libs.kotlinx.coroutines.android)
+    implementation (libs.androidx.lifecycle.common.java8)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

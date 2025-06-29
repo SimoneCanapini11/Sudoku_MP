@@ -13,7 +13,8 @@ object SudokuGameMapper {
             difficulty = game.difficulty,
             solutionJson = converters.fromSolution(game.solution),
             timerSeconds = game.timerSeconds,
-            hintLeft = game.hintLeft
+            hintLeft = game.hintLeft,
+            timestamp = game.timestamp
         )
 
     fun toDomain(entity: SudokuGameEntity): SudokuGame =
@@ -24,6 +25,7 @@ object SudokuGameMapper {
             difficulty = entity.difficulty,
             solution = converters.toSolution(entity.solutionJson),
             timerSeconds = entity.timerSeconds,
-            hintLeft = entity.hintLeft
+            hintLeft = entity.hintLeft,
+            timestamp = entity.timestamp
         )
 }

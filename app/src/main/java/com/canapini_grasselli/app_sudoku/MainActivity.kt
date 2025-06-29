@@ -1,5 +1,6 @@
 package com.canapini_grasselli.app_sudoku
 
+import android.content.ComponentCallbacks2
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,9 +8,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.canapini_grasselli.app_sudoku.di.AppViewModelProvider
@@ -17,17 +21,62 @@ import com.canapini_grasselli.app_sudoku.model.SudokuViewModel
 import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
 import com.canapini_grasselli.app_sudoku.ui.theme.App_SudokuTheme
 import com.canapini_grasselli.app_sudoku.ui.navigation.Navigation
+import kotlinx.coroutines.runBlocking
+import android.content.res.Configuration
 
 class MainActivity : ComponentActivity() {
+    private lateinit var sudokuViewModel: SudokuViewModel
+    private lateinit var lifecycleObserver: LifecycleEventObserver
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        lifecycleObserver = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_PAUSE -> {
+                    runBlocking {
+                        sudokuViewModel.saveGameOnExit()
+                    }
+                }
+                Lifecycle.Event.ON_STOP -> {
+                    runBlocking {
+                        sudokuViewModel.saveGameOnExit()
+                    }
+                }
+                else -> {}
+            }
+        }
+
+        // Observer per lifecycle
+        lifecycle.addObserver(lifecycleObserver)
+
         setContent {
             CompositionLocalProvider(
                 LocalViewModelStoreOwner provides this
             ) {
                 val themeViewModel: ThemeViewModel = viewModel()
                 val currentTheme by themeViewModel.currentTheme.collectAsState()
-                val sudokuViewModel: SudokuViewModel = viewModel(factory = AppViewModelProvider.Factory)
+                sudokuViewModel = viewModel(factory = AppViewModelProvider.Factory)
+
+                // Osserva i cambiamenti di stato dell'app
+                DisposableEffect(Unit) {
+                    val callback = object : ComponentCallbacks2 {
+                        override fun onConfigurationChanged(newConfig: Configuration) {}
+                        @Deprecated("Deprecated in Java")
+                        override fun onLowMemory() {}
+                        override fun onTrimMemory(level: Int) {
+                            if (level >= ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+                                runBlocking {
+                                    sudokuViewModel.saveGameOnExit()
+                                }
+                            }
+                        }
+                    }
+                    registerComponentCallbacks(callback)
+                    onDispose {
+                        unregisterComponentCallbacks(callback)
+                    }
+                }
 
                 App_SudokuTheme(appTheme = currentTheme)
                 {
@@ -43,9 +92,16 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(lifecycleObserver)
+        runBlocking {
+            sudokuViewModel.saveGameOnExit()
+        }
+    }
 }
 
-//continue game: salvare partita anche quando l'app viene chiusa da tasto home + clear, warning gameRepository
+//--vedere se funziona migrazione dati su un nuovo dispositivo
 //Bug: quando premo pause, poi menu per uscire, la pausa va in play e il tempo scorre
 //Gestire evento partita terminata
 //mantieni stato partita in background (?)

@@ -15,7 +15,10 @@ object AppViewModelProvider {
         initializer {
             val context = this.requireContext()
             val database = AppDatabase.getDatabase(context)
-            val repository = GameRepository(database.sudokuGameDao())
+            val repository = GameRepository(
+                dao = database.sudokuGameDao(),
+                database = database
+            )
             SudokuViewModel(repository)
         }
     }

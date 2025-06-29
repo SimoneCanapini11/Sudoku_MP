@@ -1,10 +1,12 @@
 package com.canapini_grasselli.app_sudoku.model
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.canapini_grasselli.app_sudoku.data.local.GameRepository
 import com.canapini_grasselli.app_sudoku.data.local.SudokuGameMapper
 import com.canapini_grasselli.app_sudoku.data.remote.SudokuApiClient
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 
 data class Statistics(
     val gamesPlayed: Int = 0,
@@ -127,6 +130,35 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                 }
             }
             checkSavedGame()
+        }
+    }
+
+    suspend fun saveGameOnExit() {
+        withContext(Dispatchers.IO) {
+            val currentGame = _gameState.value
+            if (!currentGame.isCompleted && hasGameStarted(currentGame)) {
+                try {
+                    val gameEntity = SudokuGameMapper.fromDomain(currentGame.copy(
+                        isPaused = true,
+                        timestamp = System.currentTimeMillis()
+                    ))
+                    repository.saveSudokuGame(gameEntity)
+
+                    withContext(Dispatchers.IO) {
+                        repository.forceWrite()
+                    }
+
+                    checkSavedGame()
+                } catch (e: Exception) {
+                    Log.e("SudokuViewModel", "Error saving game", e)
+                }
+            }
+        }
+    }
+
+    private fun hasGameStarted(game: SudokuGame): Boolean {
+        return game.grid.any { row ->
+            row.any { cell -> !cell.isFixed && cell.value != 0 }
         }
     }
 

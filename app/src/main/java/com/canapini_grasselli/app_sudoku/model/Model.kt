@@ -19,7 +19,8 @@ data class SudokuGame(
     val timerSeconds: Int = 0,
     val hintLeft: Int = 3,
     val isPaused: Boolean = false,
-    val isNotesActive: Boolean = false
+    val isNotesActive: Boolean = false,
+    val timestamp: Long = System.currentTimeMillis()
 )
 
 data class SudokuAPIResponse(
