@@ -54,9 +54,10 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(
                 LocalViewModelStoreOwner provides this
             ) {
-                val themeViewModel: ThemeViewModel = viewModel()
-                val currentTheme by themeViewModel.currentTheme.collectAsState()
+                val themeViewModel: ThemeViewModel = viewModel(factory = AppViewModelProvider.Factory)
                 sudokuViewModel = viewModel(factory = AppViewModelProvider.Factory)
+
+                val currentTheme by themeViewModel.currentTheme.collectAsState()
 
                 // Osserva i cambiamenti di stato dell'app
                 DisposableEffect(Unit) {
@@ -102,7 +103,6 @@ class MainActivity : ComponentActivity() {
 }
 
 //--vedere se funziona migrazione dati su un nuovo dispositivo
-//Mantenere colore scelto
 //Gestire evento partita terminata
 //mantieni stato partita in background (?)
 //Inserire la possibilità di mettere in pausa e quando si riapre l'applicazione l'ultima partita messa in pausa viene ricaricata

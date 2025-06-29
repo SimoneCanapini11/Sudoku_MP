@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.canapini_grasselli.app_sudoku.data.local.GameRepository
 import com.canapini_grasselli.app_sudoku.data.local.SudokuGameMapper
+import com.canapini_grasselli.app_sudoku.data.preferences.ThemePreferences
 import com.canapini_grasselli.app_sudoku.data.remote.SudokuApiClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,12 +33,13 @@ class StatisticsViewModel : ViewModel() {
     // Qui va la logica per caricare le statistiche reali
 }
 
-class ThemeViewModel : ViewModel() {
-    private val _currentTheme = MutableStateFlow(AppTheme.PURPLE)
+class ThemeViewModel (private val themePreferences: ThemePreferences) : ViewModel() {
+    private val _currentTheme = MutableStateFlow(themePreferences.getTheme())
     val currentTheme: StateFlow<AppTheme> = _currentTheme.asStateFlow()
 
     fun setTheme(theme: AppTheme) {
         _currentTheme.value = theme
+        themePreferences.saveTheme(theme)
     }
 }
 
