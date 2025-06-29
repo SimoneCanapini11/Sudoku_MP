@@ -417,7 +417,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                if (gameState.isCompleted) { //--------------------------------------------Da cambiare
+                if (gameState.isCompleted) {
                     //Utilizzo la box per allineare al centro il testo
                     Box(
                         modifier = Modifier.fillMaxWidth(),
@@ -430,7 +430,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                             fontWeight = FontWeight.Bold
                         )
                     }
-                } else { //Se si termina la partita e dopo si cancella uno dei numeri inseriti la partita continua
+                } else { //-----------Se si termina la partita e dopo si cancella uno dei numeri inseriti la partita continua
                     Text(
                         text = stringResource(R.string.errors, gameState.mistakes),
                         style = MaterialTheme.typography.titleMedium
@@ -454,11 +454,13 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Tastiera numerica
-        NumberKeyboard(
-            onNumberClick = { number -> viewModel.setNumber(number) },
-            onClearClick = { viewModel.clearCell() }
-        )
+        // Tastiera numerica (nascosta se il gioco è completato)
+        if (!gameState.isCompleted) {
+            NumberKeyboard(
+                onNumberClick = { number -> viewModel.setNumber(number) },
+                onClearClick = { viewModel.clearCell() }
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -472,11 +474,12 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = stringResource(R.string.hints_left, gameState.hintLeft),
-                    style = MaterialTheme.typography.titleMedium
-                )
-
+                if (!gameState.isCompleted) {
+                    Text(
+                        text = stringResource(R.string.hints_left, gameState.hintLeft),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
                 Text(
                     text = stringResource(
                         R.string.difficulty,
@@ -507,7 +510,9 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                 if (!gameState.isPaused) {
                     viewModel.togglePause()
                 }
-            }
+            },
+            isCompleted = gameState.isCompleted,
+            onNewGame = { viewModel.generateNewGame() }
         )
     }
 }
@@ -538,7 +543,8 @@ fun SudokuGrid(
                                 isInSameCol = gameState.selectedCol == col,
                                 isInSameBox = isInSameBox(row, col, gameState.selectedRow, gameState.selectedCol),
                                 onClick = { onCellClick(row, col) },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                isGameCompleted = gameState.isCompleted
                             )
                         }
                     }
@@ -590,7 +596,8 @@ fun SudokuCell(
     isInSameCol: Boolean,
     isInSameBox: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isGameCompleted: Boolean = false
 ) {
     val backgroundColor = when {
         isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
@@ -613,7 +620,10 @@ fun SudokuCell(
                 width = if (isSelected) 2.dp else 0.5.dp,
                 color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray
             )
-            .clickable { onClick() },
+            .then(
+                if (!isGameCompleted) Modifier.clickable { onClick() }
+                else Modifier
+            ),
         contentAlignment = Alignment.Center
     ) {
         if (cell.value != 0) {
@@ -725,6 +735,8 @@ fun BottomActionBar(
     onPause: () -> Unit,
     isPaused: Boolean,
     onMenu: () -> Unit,
+    isCompleted: Boolean = false,
+    onNewGame: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -734,6 +746,7 @@ fun BottomActionBar(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        if (!isCompleted) {
         ActionButton(
             iconRes = R.drawable.edit_note,
             label = stringResource(R.string.notes),
@@ -759,6 +772,19 @@ fun BottomActionBar(
             label = stringResource(R.string.menu),
             onClick = onMenu
         )
+            } else {
+            // Bottoni per gioco completato
+            ActionButton(
+                iconRes = R.drawable.add_circle,
+                label = stringResource(R.string.new_game),
+                onClick = onNewGame
+            )
+            ActionButton(
+                iconRes = R.drawable.home,
+                label = stringResource(R.string.menu),
+                onClick = onMenu
+            )
+        }
     }
 }
 

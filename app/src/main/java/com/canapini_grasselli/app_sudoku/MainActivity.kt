@@ -102,10 +102,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
 //--vedere se funziona migrazione dati su un nuovo dispositivo
-//Gestire evento partita terminata
+//Gestire evento partita terminata (1. numeri non modificabili, 2. bottone nuova partita, 3. bottone caricare partita disattivato, 4. salvataggio partita per statistiche)
+//evedenzia numeri uguali a quello inserito
 //mantieni stato partita in background (?)
-//Inserire la possibilità di mettere in pausa e quando si riapre l'applicazione l'ultima partita messa in pausa viene ricaricata
+
 /*
 1.      Una interfaccia utente ben fatta!
 2.      Un database dei risultati precedenti
