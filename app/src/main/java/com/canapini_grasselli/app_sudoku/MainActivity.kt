@@ -104,9 +104,9 @@ class MainActivity : ComponentActivity() {
 
 
 //--vedere se funziona migrazione dati su un nuovo dispositivo
-//Modificare campi in schermata statistiche
 //evedenzia numeri uguali a quello inserito
 //se un numero viene inserito in modo errato, rimane rosso anche se era nella posizione corretta
+//traccia audio nella home
 //mantieni stato partita in background (?)
 
 /*
