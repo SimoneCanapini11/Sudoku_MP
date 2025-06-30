@@ -100,7 +100,8 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
     private fun checkSavedGame() {
         viewModelScope.launch {
             val lastGame = repository.getLastSudokuGame()
-            _canLoadGame.value = lastGame != null && !lastGame.isCompleted
+            val lastGameDomain = lastGame?.let { SudokuGameMapper.toDomain(it) }
+            _canLoadGame.value = lastGameDomain != null && !lastGameDomain.isCompleted
         }
     }
 
@@ -110,6 +111,15 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
             val gameEntity = SudokuGameMapper.fromDomain(currentGame)
             repository.saveSudokuGame(gameEntity)
             _canLoadGame.value = !currentGame.isCompleted
+        }
+    }
+
+    private fun saveCompletedGame() {
+        viewModelScope.launch {
+            val currentGame = _gameState.value.copy(isCompleted = true)
+            val gameEntity = SudokuGameMapper.fromDomain(currentGame)
+            repository.saveSudokuGame(gameEntity)
+            _canLoadGame.value = false
         }
     }
 
@@ -210,6 +220,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
             // Se il gioco è completato
             if (isCompleted) {
                 stopTimer()
+                saveCompletedGame()
                 viewModelScope.launch {
                     val completedGame = _gameState.value
                     val gameEntity = SudokuGameMapper.fromDomain(completedGame)
@@ -384,6 +395,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
 
         if (isCompleted) {
             stopTimer()
+            saveCompletedGame()
             viewModelScope.launch {
                 val completedGame = _gameState.value
                 val gameEntity = SudokuGameMapper.fromDomain(completedGame)

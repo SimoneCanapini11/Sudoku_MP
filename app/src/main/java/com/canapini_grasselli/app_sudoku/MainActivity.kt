@@ -104,7 +104,8 @@ class MainActivity : ComponentActivity() {
 
 
 //--vedere se funziona migrazione dati su un nuovo dispositivo
-//Gestire evento partita terminata (3. bottone caricare partita disattivato, 4. salvataggio partita per statistiche)
+//Gestire evento partita terminata (4. salvataggio partita per statistiche)
+//Modificare campi in schermata statistiche
 //evedenzia numeri uguali a quello inserito
 //se un numero viene inserito in modo errato, rimane rosso anche se era nella posizione corretta
 //mantieni stato partita in background (?)

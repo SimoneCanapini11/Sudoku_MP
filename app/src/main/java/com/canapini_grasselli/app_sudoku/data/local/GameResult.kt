@@ -9,7 +9,7 @@ import com.google.gson.reflect.TypeToken
 
 @Entity(tableName = "sudoku_games")
 data class SudokuGameEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int = 1,
     val gridJson: String,           // Griglia serializzata in JSON
     val isCompleted: Boolean,
     val mistakes: Int,
