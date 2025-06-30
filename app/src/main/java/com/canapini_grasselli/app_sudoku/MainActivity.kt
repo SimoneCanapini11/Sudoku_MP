@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity() {
 
 
 //--vedere se funziona migrazione dati su un nuovo dispositivo
-//Schermata statistiche (1. best times, 2. new game resetta le statitiche)
+//Schermata statistiche (1. best times, 2. dati non salvati per cont game)
 //evedenzia numeri uguali a quello inserito
 //se un numero viene inserito in modo errato, rimane rosso anche se era nella posizione corretta
 //mantieni stato partita in background (?)

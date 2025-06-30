@@ -1092,7 +1092,7 @@ private fun DifficultyTimeItem(
             )
         }
         Text(
-            text = time,
+            text = if (time == "00:00:00") "-" else time,  //--------
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = color

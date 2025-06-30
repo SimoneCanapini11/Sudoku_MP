@@ -115,7 +115,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
     val gameState: StateFlow<SudokuGame> = _gameState.asStateFlow()
     private var _canLoadGame = MutableStateFlow(false)
     val canLoadGame: StateFlow<Boolean> = _canLoadGame.asStateFlow()
-
+    private var currentGameTimestamp = System.currentTimeMillis()
     private var timerJob: Job? = null
 
     init {
@@ -134,7 +134,9 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
     fun saveGame() {
         viewModelScope.launch {
             val currentGame = _gameState.value
-            val gameEntity = SudokuGameMapper.fromDomain(currentGame)
+            val gameEntity = SudokuGameMapper.fromDomain(currentGame.copy(
+                timestamp = currentGameTimestamp
+            ))
             repository.saveSudokuGame(gameEntity)
             _canLoadGame.value = !currentGame.isCompleted
         }
@@ -142,7 +144,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
 
     private fun saveCompletedGame() {
         viewModelScope.launch {
-            val currentGame = _gameState.value.copy(isCompleted = true, timestamp = System.currentTimeMillis())
+            val currentGame = _gameState.value.copy(isCompleted = true, timestamp = currentGameTimestamp )
             val gameEntity = SudokuGameMapper.fromDomain(currentGame)
             repository.saveSudokuGame(gameEntity)
             _canLoadGame.value = false
@@ -270,6 +272,8 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                 val solution = apiGrid.solution
                 val difficulty = apiGrid.difficulty
 
+                currentGameTimestamp = System.currentTimeMillis()
+
                 // Trasforma la griglia dell’API nel modello di dati SudokuCell
                 val newGrid = values.map { row ->
                     row.map { value ->
@@ -289,7 +293,8 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                     difficulty = difficulty,
                     solution = solution,
                     hintLeft = 3,
-                    timerSeconds = 0  // Reset timer
+                    timerSeconds = 0,  // Reset timer
+                    timestamp = currentGameTimestamp
                 )
                 startTimer()
                 checkSavedGame()
