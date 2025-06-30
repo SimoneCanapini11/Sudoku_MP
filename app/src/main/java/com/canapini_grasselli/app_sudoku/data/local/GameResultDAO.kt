@@ -10,6 +10,9 @@ interface SudokuGameDao {
     @Query("SELECT * FROM sudoku_games WHERE isCompleted = 0 ORDER BY timestamp DESC LIMIT 1")
     suspend fun getLastGame(): SudokuGameEntity?
 
+    @Query("DELETE FROM sudoku_games WHERE isCompleted = 0")
+    suspend fun deleteUncompletedGames()
+
     // Query modificate per le statistiche
     @Query("SELECT COUNT(DISTINCT timestamp) FROM sudoku_games")
     suspend fun getGamesPlayed(): Int

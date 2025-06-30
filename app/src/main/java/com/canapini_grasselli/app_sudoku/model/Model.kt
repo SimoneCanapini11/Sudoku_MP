@@ -9,6 +9,7 @@ data class SudokuCell(
 )
 
 data class SudokuGame(
+    val id: Int = 0,
     val grid: List<List<SudokuCell>> = List(9) { List(9) { SudokuCell() } },
     val selectedRow: Int = -1,
     val selectedCol: Int = -1,

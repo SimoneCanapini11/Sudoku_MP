@@ -4,7 +4,6 @@ import android.os.Process
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -66,8 +65,7 @@ fun Navigation(themeViewModel: ThemeViewModel, sudokuViewModel: SudokuViewModel)
 
         composable("stats") {
             StatisticsScreen(
-                onNavigateBack = { navController.navigateUp() },
-                context = LocalContext.current
+                onNavigateBack = { navController.navigateUp() }
             )
         }
     }

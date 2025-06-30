@@ -7,6 +7,7 @@ object SudokuGameMapper {
 
     fun fromDomain(game: SudokuGame): SudokuGameEntity =
         SudokuGameEntity(
+            id = 0,
             gridJson = converters.fromGridToJson(game.grid),
             isCompleted = game.isCompleted,
             mistakes = game.mistakes,
@@ -19,6 +20,7 @@ object SudokuGameMapper {
 
     fun toDomain(entity: SudokuGameEntity): SudokuGame =
         SudokuGame(
+            id = 0,
             grid = converters.fromJsonToGrid(entity.gridJson),
             isCompleted = entity.isCompleted,
             mistakes = entity.mistakes,

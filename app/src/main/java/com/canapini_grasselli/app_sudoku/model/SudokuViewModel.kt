@@ -34,7 +34,7 @@ class StatisticsViewModel (private val repository: GameRepository) : ViewModel()
         loadStatistics()
     }
 
-    fun loadStatistics() {
+    private fun loadStatistics() {
         viewModelScope.launch {
             try {
                 val gamesPlayed = repository.getGamesPlayed()
@@ -56,6 +56,9 @@ class StatisticsViewModel (private val repository: GameRepository) : ViewModel()
                 Log.e("StatisticsViewModel", "Error loading statistics", e)
             }
         }
+    }
+    fun refreshStatistics() {
+        loadStatistics()
     }
 }
 
@@ -109,7 +112,7 @@ class NavigationViewModel : ViewModel() {
     }
 }
 
-class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
+class SudokuViewModel (private val repository: GameRepository, private val statisticsViewModel: StatisticsViewModel) : ViewModel() {
 
     private val _gameState = MutableStateFlow(SudokuGame())
     val gameState: StateFlow<SudokuGame> = _gameState.asStateFlow()
@@ -135,10 +138,19 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
         viewModelScope.launch {
             val currentGame = _gameState.value
             val gameEntity = SudokuGameMapper.fromDomain(currentGame.copy(
+                id = 0,
                 timestamp = currentGameTimestamp
             ))
             repository.saveSudokuGame(gameEntity)
             _canLoadGame.value = !currentGame.isCompleted
+
+            repository.forceWrite()
+
+            checkSavedGame()
+
+            if (currentGame.isCompleted) {
+                statisticsViewModel.refreshStatistics()
+            }
         }
     }
 
@@ -148,28 +160,37 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
             val gameEntity = SudokuGameMapper.fromDomain(currentGame)
             repository.saveSudokuGame(gameEntity)
             _canLoadGame.value = false
+
+            statisticsViewModel.refreshStatistics()
         }
     }
 
     fun loadLastGame() {
         viewModelScope.launch {
-            stopTimer()
-            val lastGame = repository.getLastSudokuGame()
-            lastGame?.let {
-                val loadedGame = SudokuGameMapper.toDomain(it)
-                _gameState.value = loadedGame.copy(
-                    selectedRow = -1,
-                    selectedCol = -1,
-                    isPaused = false,
-                    isNotesActive = false
-                )
-                if (!loadedGame.isCompleted) {
-                    startTimer()
+            try {
+                stopTimer()
+                val lastGame = repository.getLastSudokuGame()
+                lastGame?.let {
+                    val loadedGame = SudokuGameMapper.toDomain(it)
+                    _gameState.value = loadedGame.copy(
+                        selectedRow = -1,
+                        selectedCol = -1,
+                        isPaused = false,
+                        isNotesActive = false,
+                        timestamp = System.currentTimeMillis(),
+                        id = 0
+                    )
+                    if (!loadedGame.isCompleted) {
+                        startTimer()
+                    }
                 }
+                checkSavedGame()
+            } catch (e: Exception) {
+                Log.e("SudokuViewModel", "Error loading last game", e)
             }
-            checkSavedGame()
         }
     }
+
 
     suspend fun saveGameOnExit() {
         withContext(Dispatchers.IO) {
@@ -179,7 +200,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                     val gameEntity = SudokuGameMapper.fromDomain(currentGame.copy(
                         isPaused = true,
                         timestamp = System.currentTimeMillis()
-                    ))
+                    )).copy(id = 0)
                     repository.saveSudokuGame(gameEntity)
 
                     withContext(Dispatchers.IO) {
@@ -187,6 +208,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                     }
 
                     checkSavedGame()
+
                 } catch (e: Exception) {
                     Log.e("SudokuViewModel", "Error saving game", e)
                 }

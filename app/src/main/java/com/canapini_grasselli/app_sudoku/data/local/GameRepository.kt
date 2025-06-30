@@ -6,7 +6,20 @@ import kotlinx.coroutines.withContext
 
 class GameRepository(private val dao: SudokuGameDao, private val database: AppDatabase ) {
 
-    suspend fun saveSudokuGame(game: SudokuGameEntity) = dao.insertGame(game)
+    suspend fun saveSudokuGame(game: SudokuGameEntity) {
+        withContext(Dispatchers.IO) {
+            try {
+                if (!game.isCompleted) {
+                    dao.deleteUncompletedGames()
+                }
+                dao.insertGame(game)
+                forceWrite()
+            } catch (e: Exception) {
+                Log.e("GameRepository", "Error saving game", e)
+            }
+        }
+    }
+
 
     suspend fun getLastSudokuGame(): SudokuGameEntity? = dao.getLastGame()
 
