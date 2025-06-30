@@ -109,7 +109,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
             val currentGame = _gameState.value
             val gameEntity = SudokuGameMapper.fromDomain(currentGame)
             repository.saveSudokuGame(gameEntity)
-            checkSavedGame()
+            _canLoadGame.value = !currentGame.isCompleted
         }
     }
 
@@ -214,7 +214,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                     val completedGame = _gameState.value
                     val gameEntity = SudokuGameMapper.fromDomain(completedGame)
                     repository.saveSudokuGame(gameEntity)
-                    checkSavedGame()
+                    _canLoadGame.value = false
                 }
             }
         }
@@ -388,7 +388,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                 val completedGame = _gameState.value
                 val gameEntity = SudokuGameMapper.fromDomain(completedGame)
                 repository.saveSudokuGame(gameEntity)
-                checkSavedGame()
+                _canLoadGame.value = false
             }
         }
     }
