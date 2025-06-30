@@ -4,12 +4,12 @@ import android.os.Process
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.canapini_grasselli.app_sudoku.model.NavigationViewModel
-import com.canapini_grasselli.app_sudoku.model.StatisticsViewModel
 import com.canapini_grasselli.app_sudoku.model.SudokuViewModel
 import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
 import com.canapini_grasselli.app_sudoku.views.HomeScreen
@@ -21,7 +21,8 @@ fun Navigation(themeViewModel: ThemeViewModel, sudokuViewModel: SudokuViewModel)
     val navController = rememberNavController()
     val navigationViewModel: NavigationViewModel = viewModel()
     val navigationEvent by navigationViewModel.navigationEvent.collectAsState()
-    val statisticsViewModel: StatisticsViewModel = viewModel()
+    val context = LocalContext.current
+
 
     // Gestione degli eventi di navigazione
     navigationEvent?.let { event ->
@@ -68,7 +69,7 @@ fun Navigation(themeViewModel: ThemeViewModel, sudokuViewModel: SudokuViewModel)
         composable("stats") {
             StatisticsScreen(
                 onNavigateBack = { navController.navigateUp() },
-                statisticsViewModel = statisticsViewModel
+                context = context
             )
         }
     }

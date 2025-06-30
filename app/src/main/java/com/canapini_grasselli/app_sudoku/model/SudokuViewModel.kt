@@ -26,11 +26,41 @@ data class Statistics(
     val bestTimeHard: Int = 0
 )
 
-class StatisticsViewModel : ViewModel() {
+class StatisticsViewModel(private val repository: GameRepository) : ViewModel() {
     private val _statistics = MutableStateFlow(Statistics())
     val statistics: StateFlow<Statistics> = _statistics.asStateFlow()
 
-    // -------Qui va la logica per caricare le statistiche reali
+    init {
+        loadStatistics()
+    }
+
+    private fun loadStatistics() {
+        viewModelScope.launch {
+            try {
+                val gamesPlayed = repository.getGamesPlayed()
+                val gamesWon = repository.getGamesWon()
+                val perfectWins = repository.getPerfectWins()
+                val bestTimeEasy = repository.getBestTimeEasy()
+                val bestTimeMedium = repository.getBestTimeMedium()
+                val bestTimeHard = repository.getBestTimeHard()
+
+                _statistics.value = Statistics(
+                    gamesPlayed = gamesPlayed,
+                    gamesWon = gamesWon,
+                    perfectWins = perfectWins,
+                    bestTimeEasy = bestTimeEasy,
+                    bestTimeMedium = bestTimeMedium,
+                    bestTimeHard = bestTimeHard
+                )
+            } catch (e: Exception) {
+                Log.e("StatisticsViewModel", "Error loading statistics", e)
+            }
+        }
+    }
+
+    fun refreshStatistics() {
+        loadStatistics()
+    }
 }
 
 class ThemeViewModel (private val themePreferences: ThemePreferences) : ViewModel() {
@@ -109,7 +139,13 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
         viewModelScope.launch {
             val currentGame = _gameState.value
             val gameEntity = SudokuGameMapper.fromDomain(currentGame)
-            repository.saveSudokuGame(gameEntity)
+
+            if (currentGame.id != 0L) {
+                repository.updateSudokuGame(gameEntity)
+            } else {
+                repository.saveSudokuGame(gameEntity)
+            }
+
             _canLoadGame.value = !currentGame.isCompleted
         }
     }
@@ -263,7 +299,8 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                     difficulty = difficulty,
                     solution = solution,
                     hintLeft = 3,
-                    timerSeconds = 0  // Reset timer
+                    timerSeconds = 0, // Reset timer
+                    timestamp = System.currentTimeMillis()
                 )
                 startTimer()
                 checkSavedGame()

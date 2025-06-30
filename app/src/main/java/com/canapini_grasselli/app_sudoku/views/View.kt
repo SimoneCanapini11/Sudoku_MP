@@ -1,5 +1,6 @@
 package com.canapini_grasselli.app_sudoku.views
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -28,6 +29,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
+import com.canapini_grasselli.app_sudoku.data.local.AppDatabase
+import com.canapini_grasselli.app_sudoku.data.local.GameRepository
+import com.canapini_grasselli.app_sudoku.di.StatisticsViewModelFactory
 import com.canapini_grasselli.app_sudoku.model.AppTheme
 import com.canapini_grasselli.app_sudoku.model.StatisticsViewModel
 import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
@@ -872,9 +876,19 @@ fun ActionButton(
 @Composable
 fun StatisticsScreen(
     onNavigateBack: () -> Unit,
-    statisticsViewModel: StatisticsViewModel = viewModel()
+    context: Context
 ) {
+    val database = AppDatabase.getDatabase(context)
+    val repository = GameRepository(database.sudokuGameDao(), database)
+    val statisticsViewModel: StatisticsViewModel = viewModel(
+        factory = StatisticsViewModelFactory(repository)
+    )
+
     val statistics by statisticsViewModel.statistics.collectAsState()
+
+    LaunchedEffect(Unit) {
+        statisticsViewModel.refreshStatistics()
+    }
 
     Column(
         modifier = Modifier
