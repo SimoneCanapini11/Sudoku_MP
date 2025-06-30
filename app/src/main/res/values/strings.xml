@@ -33,4 +33,5 @@
     <string name="medium_difficulty">Medium</string>
     <string name="hard_difficulty">Hard</string>
     <string name="completion_time">Time: %s</string>
+    <string name="perfect_wins">Perfect Wins</string>
 </resources>

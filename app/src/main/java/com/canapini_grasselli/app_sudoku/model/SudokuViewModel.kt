@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 data class Statistics(
     val gamesPlayed: Int = 0,
     val gamesWon: Int = 0,
-    val gamesCompleted: Int = 0,
+    val perfectWins: Int = 0,
     val bestTimeEasy: Int = 0,
     val bestTimeMedium: Int = 0,
     val bestTimeHard: Int = 0
@@ -30,7 +30,7 @@ class StatisticsViewModel : ViewModel() {
     private val _statistics = MutableStateFlow(Statistics())
     val statistics: StateFlow<Statistics> = _statistics.asStateFlow()
 
-    // Qui va la logica per caricare le statistiche reali
+    // -------Qui va la logica per caricare le statistiche reali
 }
 
 class ThemeViewModel (private val themePreferences: ThemePreferences) : ViewModel() {

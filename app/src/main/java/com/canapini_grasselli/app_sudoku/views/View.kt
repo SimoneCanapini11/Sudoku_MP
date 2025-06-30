@@ -923,7 +923,6 @@ fun StatisticsScreen(
             title = stringResource(R.string.general_statistics),
             icon = R.drawable.icon_stats,
             content = {
-                // Statistiche partite con dimensioni maggiori
                 StatisticItem(
                     label = stringResource(R.string.games_played),
                     value = statistics.gamesPlayed.toString(),
@@ -934,11 +933,10 @@ fun StatisticsScreen(
                     value = statistics.gamesWon.toString(),
                     icon = R.drawable.icon_trophy
                 )
-                // Statistiche completate normali
                 StatisticItem(
-                    label = stringResource(R.string.games_completed),
-                    value = statistics.gamesCompleted.toString(),
-                    icon = R.drawable.icon_check_circle
+                    label = stringResource(R.string.perfect_wins),
+                    value = statistics.perfectWins.toString(),
+                    icon = R.drawable.icon_crown
                 )
             }
         )
