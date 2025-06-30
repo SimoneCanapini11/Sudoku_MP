@@ -207,10 +207,15 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                 isCompleted = isCompleted
             )
 
+            // Se il gioco è completato
             if (isCompleted) {
                 stopTimer()
-                saveGame()
-                checkSavedGame()
+                viewModelScope.launch {
+                    val completedGame = _gameState.value
+                    val gameEntity = SudokuGameMapper.fromDomain(completedGame)
+                    repository.saveSudokuGame(gameEntity)
+                    checkSavedGame()
+                }
             }
         }
     }
@@ -379,8 +384,12 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
 
         if (isCompleted) {
             stopTimer()
-            saveGame()
-            checkSavedGame()
+            viewModelScope.launch {
+                val completedGame = _gameState.value
+                val gameEntity = SudokuGameMapper.fromDomain(completedGame)
+                repository.saveSudokuGame(gameEntity)
+                checkSavedGame()
+            }
         }
     }
 
