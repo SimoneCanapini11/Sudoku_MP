@@ -965,17 +965,17 @@ fun StatisticsScreen(
                 DifficultyTimeItem(
                     difficulty = stringResource(R.string.easy_difficulty),
                     time = statistics.bestTimeEasy.toTimeString(),
-                    color = Color(0xFF4CAF50)
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                 )
                 DifficultyTimeItem(
                     difficulty = stringResource(R.string.medium_difficulty),
                     time = statistics.bestTimeMedium.toTimeString(),
-                    color = Color(0xFFFFA000)
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                 )
                 DifficultyTimeItem(
                     difficulty = stringResource(R.string.hard_difficulty),
                     time = statistics.bestTimeHard.toTimeString(),
-                    color = Color(0xFFE53935)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         )
