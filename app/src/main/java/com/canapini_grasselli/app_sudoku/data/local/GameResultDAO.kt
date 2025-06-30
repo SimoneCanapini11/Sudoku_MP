@@ -10,26 +10,11 @@ interface SudokuGameDao {
     @Query("SELECT * FROM sudoku_games WHERE isCompleted = 0 ORDER BY timestamp DESC LIMIT 1")
     suspend fun getLastGame(): SudokuGameEntity?
 
-    @Query("DELETE FROM sudoku_games WHERE isCompleted = 0")
-    suspend fun deleteUncompletedGames()
+    // Estrai tutte le partite
+    @Query("SELECT * FROM sudoku_games")
+    suspend fun getAllGames(): List<SudokuGameEntity>
 
-    // Query modificate per le statistiche
-    @Query("SELECT COUNT(DISTINCT timestamp) FROM sudoku_games")
-    suspend fun getGamesPlayed(): Int
-
-    @Query("SELECT COUNT(DISTINCT timestamp) FROM sudoku_games WHERE isCompleted = 1")
-    suspend fun getGamesWon(): Int
-
-    @Query("SELECT COUNT(DISTINCT timestamp) FROM sudoku_games WHERE isCompleted = 1 AND mistakes = 0")
-    suspend fun getPerfectWins(): Int
-
-    // Query modificate per i best times
-    @Query("SELECT MIN(timerSeconds) FROM sudoku_games WHERE isCompleted = 1 AND difficulty = 'easy'")
-    suspend fun getBestTimeEasy(): Int?
-
-    @Query("SELECT MIN(timerSeconds) FROM sudoku_games WHERE isCompleted = 1 AND difficulty = 'medium'")
-    suspend fun getBestTimeMedium(): Int?
-
-    @Query("SELECT MIN(timerSeconds) FROM sudoku_games WHERE isCompleted = 1 AND difficulty = 'hard'")
-    suspend fun getBestTimeHard(): Int?
+    // Estrai tutte le partite completate
+    @Query("SELECT * FROM sudoku_games WHERE isCompleted = 1")
+    suspend fun getCompletedGames(): List<SudokuGameEntity>
 }
