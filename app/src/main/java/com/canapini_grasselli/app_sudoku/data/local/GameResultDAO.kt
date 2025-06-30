@@ -14,7 +14,6 @@ interface SudokuGameDao {
     @Query("SELECT * FROM sudoku_games")
     suspend fun getAllGames(): List<SudokuGameEntity>
 
-    // Estrai tutte le partite completate
     @Query("SELECT * FROM sudoku_games WHERE isCompleted = 1")
     suspend fun getCompletedGames(): List<SudokuGameEntity>
 }
