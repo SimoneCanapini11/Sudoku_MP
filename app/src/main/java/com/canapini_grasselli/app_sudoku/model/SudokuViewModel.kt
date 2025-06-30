@@ -26,11 +26,37 @@ data class Statistics(
     val bestTimeHard: Int = 0
 )
 
-class StatisticsViewModel : ViewModel() {
+class StatisticsViewModel (private val repository: GameRepository) : ViewModel() {
     private val _statistics = MutableStateFlow(Statistics())
     val statistics: StateFlow<Statistics> = _statistics.asStateFlow()
 
-    // -------Qui va la logica per caricare le statistiche reali
+    init {
+        loadStatistics()
+    }
+
+    fun loadStatistics() {
+        viewModelScope.launch {
+            try {
+                val gamesPlayed = repository.getGamesPlayed()
+                val gamesWon = repository.getGamesWon()
+                val perfectWins = repository.getPerfectWins()
+                val bestTimeEasy = repository.getBestTimeEasy()
+                val bestTimeMedium = repository.getBestTimeMedium()
+                val bestTimeHard = repository.getBestTimeHard()
+
+                _statistics.value = Statistics(
+                    gamesPlayed = gamesPlayed,
+                    gamesWon = gamesWon,
+                    perfectWins = perfectWins,
+                    bestTimeEasy = bestTimeEasy,
+                    bestTimeMedium = bestTimeMedium,
+                    bestTimeHard = bestTimeHard
+                )
+            } catch (e: Exception) {
+                Log.e("StatisticsViewModel", "Error loading statistics", e)
+            }
+        }
+    }
 }
 
 class ThemeViewModel (private val themePreferences: ThemePreferences) : ViewModel() {
@@ -116,7 +142,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
 
     private fun saveCompletedGame() {
         viewModelScope.launch {
-            val currentGame = _gameState.value.copy(isCompleted = true)
+            val currentGame = _gameState.value.copy(isCompleted = true, timestamp = System.currentTimeMillis())
             val gameEntity = SudokuGameMapper.fromDomain(currentGame)
             repository.saveSudokuGame(gameEntity)
             _canLoadGame.value = false

@@ -19,4 +19,17 @@ class GameRepository(private val dao: SudokuGameDao, private val database: AppDa
             }
         }
     }
+
+    // Metodi per le statistiche
+    suspend fun getGamesPlayed(): Int = dao.getGamesPlayed()
+
+    suspend fun getGamesWon(): Int = dao.getGamesWon()
+
+    suspend fun getPerfectWins(): Int = dao.getPerfectWins()
+
+    suspend fun getBestTimeEasy(): Int = dao.getBestTimeEasy() ?: 0
+
+    suspend fun getBestTimeMedium(): Int = dao.getBestTimeMedium() ?: 0
+
+    suspend fun getBestTimeHard(): Int = dao.getBestTimeHard() ?: 0
 }
