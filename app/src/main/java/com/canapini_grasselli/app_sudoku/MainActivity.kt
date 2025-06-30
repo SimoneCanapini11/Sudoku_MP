@@ -107,6 +107,7 @@ class MainActivity : ComponentActivity() {
 //Schermata statistiche (1. best times, 2. dati non salvati per cont game)
 //evedenzia numeri uguali a quello inserito
 //se un numero viene inserito in modo errato, rimane rosso anche se era nella posizione corretta
+// musica nella home
 //mantieni stato partita in background (?)
 
 /*
