@@ -36,13 +36,14 @@ class StatisticsViewModel (private val repository: GameRepository) : ViewModel()
 
     private fun loadStatistics() {
         viewModelScope.launch {
-            try {
-                val gamesPlayed = repository.getGamesPlayed()
-                val gamesWon = repository.getGamesWon()
-                val perfectWins = repository.getPerfectWins()
-                val bestTimeEasy = repository.getBestTimeEasy()
-                val bestTimeMedium = repository.getBestTimeMedium()
-                val bestTimeHard = repository.getBestTimeHard()
+            val allGames = repository.getAllGames()
+            val completedGames = allGames.filter { it.isCompleted }
+            val gamesPlayed = allGames.size
+            val gamesWon = completedGames.size
+            val perfectWins = completedGames.count { it.mistakes == 0 }
+            val bestTimeEasy = completedGames.filter { it.difficulty == "easy" }.minOfOrNull { it.timerSeconds } ?: 0
+            val bestTimeMedium = completedGames.filter { it.difficulty == "medium" }.minOfOrNull { it.timerSeconds } ?: 0
+            val bestTimeHard = completedGames.filter { it.difficulty == "hard" }.minOfOrNull { it.timerSeconds } ?: 0
 
                 _statistics.value = Statistics(
                     gamesPlayed = gamesPlayed,
@@ -52,9 +53,6 @@ class StatisticsViewModel (private val repository: GameRepository) : ViewModel()
                     bestTimeMedium = bestTimeMedium,
                     bestTimeHard = bestTimeHard
                 )
-            } catch (e: Exception) {
-                Log.e("StatisticsViewModel", "Error loading statistics", e)
-            }
         }
     }
     fun refreshStatistics() {
