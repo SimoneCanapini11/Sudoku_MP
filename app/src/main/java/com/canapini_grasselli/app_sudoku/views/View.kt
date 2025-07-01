@@ -343,6 +343,7 @@ fun HomeScreen(
 @Composable
 fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavController) {
     val gameState by viewModel.gameState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     var showExitDialog by remember { mutableStateOf(false) }
     var wasPaused by remember { mutableStateOf(false) }
 
@@ -403,127 +404,159 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
         )
     }
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp), // padding top aumentato
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Header con statistiche
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Box(
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (!isLoading) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
+                    .fillMaxSize()
+                    .padding(
+                        top = 48.dp,
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 16.dp
+                    ), // padding top aumentato
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (gameState.isCompleted) {
-                        Text(
-                            text = stringResource(R.string.game_completed_you_win),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        )
-                } else {
+                // Header con statistiche
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (gameState.isCompleted) {
+                            Text(
+                                text = stringResource(R.string.game_completed_you_win),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        } else {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.errors, gameState.mistakes),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+
+                                Text(
+                                    text = stringResource(
+                                        R.string.timer,
+                                        gameState.timerSeconds.toTimeString()
+                                    ),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Griglia Sudoku
+                SudokuGrid(
+                    gameState = gameState,
+                    onCellClick = { row, col -> viewModel.selectCell(row, col) }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Tastiera numerica (nascosta se il gioco è completato)
+                if (!gameState.isCompleted) {
+                    NumberKeyboard(
+                        onNumberClick = { number -> viewModel.setNumber(number) },
+                        onClearClick = { viewModel.clearCell() }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = stringResource(R.string.errors, gameState.mistakes),
+                            text = if (gameState.isCompleted)
+                                stringResource(
+                                    R.string.completion_time,
+                                    gameState.timerSeconds.toTimeString()
+                                )
+                            else
+                                stringResource(R.string.hints_left, gameState.hintLeft),
                             style = MaterialTheme.typography.titleMedium
                         )
 
                         Text(
                             text = stringResource(
-                                R.string.timer,
-                                gameState.timerSeconds.toTimeString()
+                                R.string.difficulty,
+                                gameState.difficulty.replaceFirstChar {
+                                    if (it.isLowerCase()) it.titlecase(Locale.ROOT)
+                                    else it.toString()
+                                }
                             ),
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
                 }
-            }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Griglia Sudoku
-        SudokuGrid(
-            gameState = gameState,
-            onCellClick = { row, col -> viewModel.selectCell(row, col) }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Tastiera numerica (nascosta se il gioco è completato)
-        if (!gameState.isCompleted) {
-            NumberKeyboard(
-                onNumberClick = { number -> viewModel.setNumber(number) },
-                onClearClick = { viewModel.clearCell() }
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = if (gameState.isCompleted)
-                        stringResource(R.string.completion_time, gameState.timerSeconds.toTimeString())
-                    else
-                        stringResource(R.string.hints_left, gameState.hintLeft),
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Text(
-                    text = stringResource(
-                        R.string.difficulty,
-                        gameState.difficulty.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(Locale.ROOT)
-                            else it.toString()
-                        }
-                    ),
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-        }
-
-        if (gameState.isCompleted) {
-            Spacer(modifier = Modifier.height(26.dp))
-        } else {
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        //Menu di bottoni
-        BottomActionBar(
-            onNotes = { viewModel.toggleNotes() },
-            notesActive = gameState.isNotesActive,
-            onHint = { viewModel.generateHint() },
-            hintCount = gameState.hintLeft,
-            onPause = { viewModel.togglePause() },
-            isPaused = gameState.isPaused,
-            onMenu = {
-                wasPaused = gameState.isPaused  // Salva lo stato corrente
-                showExitDialog = true
-                if (!gameState.isPaused) {
-                    viewModel.togglePause()
+                if (gameState.isCompleted) {
+                    Spacer(modifier = Modifier.height(26.dp))
+                } else {
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-            },
-            isCompleted = gameState.isCompleted,
-            onNewGame = { viewModel.generateNewGame() }
-        )
+
+                //Menu di bottoni
+                BottomActionBar(
+                    onNotes = { viewModel.toggleNotes() },
+                    notesActive = gameState.isNotesActive,
+                    onHint = { viewModel.generateHint() },
+                    hintCount = gameState.hintLeft,
+                    onPause = { viewModel.togglePause() },
+                    isPaused = gameState.isPaused,
+                    onMenu = {
+                        wasPaused = gameState.isPaused  // Salva lo stato corrente
+                        showExitDialog = true
+                        if (!gameState.isPaused) {
+                            viewModel.togglePause()
+                        }
+                    },
+                    isCompleted = gameState.isCompleted,
+                    onNewGame = { viewModel.generateNewGame() }
+                )
+            }
+        } else {
+            // Indicatore di caricamento
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(50.dp),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = stringResource(R.string.loading_new_game),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
     }
 }
 

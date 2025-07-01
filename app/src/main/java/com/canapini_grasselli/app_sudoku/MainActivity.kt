@@ -105,9 +105,7 @@ class MainActivity : ComponentActivity() {
 
 
 //--vedere se funziona migrazione dati su un nuovo dispositivo
-//lag chiamata nuova partita
 //traccia audio nella home
-//mantieni stato partita in background (?)
 
 /*
 1.      Una interfaccia utente ben fatta!

@@ -120,6 +120,9 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
     private var _canLoadGame = MutableStateFlow(false)
     val canLoadGame: StateFlow<Boolean> = _canLoadGame.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     private var timerJob: Job? = null
 
     init {
@@ -323,6 +326,8 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
 
     fun generateNewGame() {
         viewModelScope.launch {
+            try {
+                _isLoading.value = true
                 stopTimer() // Ferma il timer esistente
                 val response = SudokuApiClient.service.getSudoku()
                 val apiGrid = response.newboard.grids.first()
@@ -335,7 +340,8 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                     row.map { value ->
                         SudokuCell(
                             value = if (value == 0) 0 else value,
-                            isFixed = value != 0
+                            isFixed = value != 0,
+                            isValid = true
                         )
                     }
                 }
@@ -354,6 +360,11 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                 )
                 startTimer()
                 checkSavedGame()
+            } catch (e: Exception) {
+                Log.e("SudokuViewModel", "Error generating new game", e)
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
