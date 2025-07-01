@@ -913,15 +913,17 @@ fun BottomActionBar(
             // Bottoni per gioco completato
             ActionButton(
                 iconRes = R.drawable.add_circle,
-                label = stringResource(R.string.new_game),
+                label = stringResource(R.string.new_sudoku_game),
                 onClick = onNewGame,
-                windowSize = windowSize
+                windowSize = windowSize,
+                isEndGameButton = true
             )
             ActionButton(
                 iconRes = R.drawable.home,
                 label = stringResource(R.string.menu),
                 onClick = onMenu,
-                windowSize = windowSize
+                windowSize = windowSize,
+                isEndGameButton = true
             )
         }
     }
@@ -936,13 +938,22 @@ fun ActionButton(
     isActive: Boolean = false,
     badgeText: String? = null,
     enabled: Boolean = true,
-    windowSize: WindowWidthSizeClass
+    windowSize: WindowWidthSizeClass,
+    isEndGameButton: Boolean = false
 ) {
-    val buttonWidth = when (windowSize) {
-        WindowWidthSizeClass.Compact -> 80.dp
-        WindowWidthSizeClass.Medium -> 100.dp
-        WindowWidthSizeClass.Expanded -> 120.dp
-        else -> 80.dp
+    val buttonWidth = when {
+        isEndGameButton -> when (windowSize) {
+            WindowWidthSizeClass.Compact -> 95.dp
+            WindowWidthSizeClass.Medium -> 100.dp
+            WindowWidthSizeClass.Expanded -> 120.dp
+            else -> 95.dp
+        }
+        else -> when (windowSize) {
+            WindowWidthSizeClass.Compact -> 80.dp
+            WindowWidthSizeClass.Medium -> 100.dp
+            WindowWidthSizeClass.Expanded -> 120.dp
+            else -> 80.dp
+        }
     }
 
     val backgroundColor = when {
