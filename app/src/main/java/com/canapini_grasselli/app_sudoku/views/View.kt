@@ -27,7 +27,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavController
 import com.canapini_grasselli.app_sudoku.data.local.AppDatabase
 import com.canapini_grasselli.app_sudoku.data.local.GameRepository
@@ -341,7 +343,7 @@ fun HomeScreen(
 
 //Schermata Sudoku
 @Composable
-fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavController) {
+fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavController, windowSize: WindowWidthSizeClass) {
     val gameState by viewModel.gameState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     var showExitDialog by remember { mutableStateOf(false) }
@@ -404,17 +406,24 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
         )
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .systemBarsPadding()
+        .padding(top = 10.dp)
+    ) {
         if (!isLoading) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
-                        top = 48.dp,
+                        top = when (windowSize) {
+                            WindowWidthSizeClass.Compact -> 16.dp
+                            else -> 24.dp
+                        },
                         start = 16.dp,
                         end = 16.dp,
                         bottom = 16.dp
-                    ), // padding top aumentato
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Header con statistiche
@@ -462,7 +471,8 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                 // Griglia Sudoku
                 SudokuGrid(
                     gameState = gameState,
-                    onCellClick = { row, col -> viewModel.selectCell(row, col) }
+                    onCellClick = { row, col -> viewModel.selectCell(row, col) },
+                    windowSize = windowSize
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -471,7 +481,8 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                 if (!gameState.isCompleted) {
                     NumberKeyboard(
                         onNumberClick = { number -> viewModel.setNumber(number) },
-                        onClearClick = { viewModel.clearCell() }
+                        onClearClick = { viewModel.clearCell() },
+                        windowSize = windowSize
                     )
                 }
 
@@ -533,7 +544,8 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                         }
                     },
                     isCompleted = gameState.isCompleted,
-                    onNewGame = { viewModel.generateNewGame() }
+                    onNewGame = { viewModel.generateNewGame() },
+                    windowSize = windowSize
                 )
             }
         } else {
@@ -563,10 +575,19 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
 @Composable
 fun SudokuGrid(
     gameState: SudokuGame,
-    onCellClick: (Int, Int) -> Unit
+    onCellClick: (Int, Int) -> Unit,
+    windowSize: WindowWidthSizeClass
 ) {
+    val gridSize = when (windowSize) {
+        WindowWidthSizeClass.Compact -> 0.95f
+        WindowWidthSizeClass.Medium -> 0.8f
+        WindowWidthSizeClass.Expanded -> 0.6f
+        else -> 0.95f
+    }
     Card(
-        modifier = Modifier.aspectRatio(1f),
+        modifier = Modifier
+            .fillMaxWidth(gridSize)
+            .aspectRatio(1f),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Box(
@@ -753,10 +774,18 @@ fun SudokuCell(
 @Composable
 fun NumberKeyboard(
     onNumberClick: (Int) -> Unit,
-    onClearClick: () -> Unit
+    onClearClick: () -> Unit,
+    windowSize: WindowWidthSizeClass
 ) {
+    val buttonSize = when (windowSize) {
+        WindowWidthSizeClass.Compact -> 45.dp
+        WindowWidthSizeClass.Medium -> 60.dp
+        WindowWidthSizeClass.Expanded -> 70.dp
+        else -> 45.dp
+    }
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(0.95f),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -770,7 +799,8 @@ fun NumberKeyboard(
                 for (i in 1..5) {
                     NumberButton(
                         number = i,
-                        onClick = { onNumberClick(i) }
+                        onClick = { onNumberClick(i) },
+                        size = buttonSize
                     )
                 }
             }
@@ -785,19 +815,20 @@ fun NumberKeyboard(
                 for (i in 6..9) {
                     NumberButton(
                         number = i,
-                        onClick = { onNumberClick(i) }
+                        onClick = { onNumberClick(i) },
+                        size = buttonSize
                     )
                 }
                 Button(
                     onClick = onClearClick,
-                    modifier = Modifier.size(50.dp),
+                    modifier = Modifier.size(buttonSize),
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(0.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.close_50),
                         contentDescription = "X",
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(buttonSize * 0.8f)
 
                     )
 
@@ -810,17 +841,18 @@ fun NumberKeyboard(
 @Composable
 fun NumberButton(
     number: Int,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    size: Dp
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier.size(50.dp),
+        modifier = Modifier.size(size),
         shape = RoundedCornerShape(8.dp),
         contentPadding = PaddingValues(0.dp) //padding per centrare il numero
     ) {
         Text(
             text = number.toString(),
-            fontSize = 18.sp,
+            fontSize = (size.value * 0.36f).sp,
             fontWeight = FontWeight.Medium
         )
     }
@@ -836,7 +868,8 @@ fun BottomActionBar(
     isPaused: Boolean,
     onMenu: () -> Unit,
     isCompleted: Boolean = false,
-    onNewGame: () -> Unit = {}
+    onNewGame: () -> Unit = {},
+    windowSize: WindowWidthSizeClass
 ) {
     Row(
         modifier = Modifier
@@ -852,37 +885,43 @@ fun BottomActionBar(
             label = stringResource(R.string.notes),
             onClick = onNotes,
             isActive = notesActive,
-            badgeText = if (notesActive) "ON" else "OFF"
+            badgeText = if (notesActive) "ON" else "OFF",
+            windowSize = windowSize
         )
         ActionButton(
             iconRes = R.drawable.emoji_objects,
             label = stringResource(R.string.hints),
             onClick = onHint,
-            enabled = hintCount > 0
+            enabled = hintCount > 0,
+            windowSize = windowSize
         )
         ActionButton(
             iconRes = R.drawable.pause, //pause/play
             iconContinue = R.drawable.play_arrow,
             label = stringResource(R.string.pause),
             onClick = onPause,
-            isActive = isPaused
+            isActive = isPaused,
+            windowSize = windowSize
         )
         ActionButton(
             iconRes = R.drawable.home,
             label = stringResource(R.string.menu),
-            onClick = onMenu
+            onClick = onMenu,
+            windowSize = windowSize
         )
             } else {
             // Bottoni per gioco completato
             ActionButton(
                 iconRes = R.drawable.add_circle,
                 label = stringResource(R.string.new_game),
-                onClick = onNewGame
+                onClick = onNewGame,
+                windowSize = windowSize
             )
             ActionButton(
                 iconRes = R.drawable.home,
                 label = stringResource(R.string.menu),
-                onClick = onMenu
+                onClick = onMenu,
+                windowSize = windowSize
             )
         }
     }
@@ -896,18 +935,28 @@ fun ActionButton(
     onClick: () -> Unit,
     isActive: Boolean = false,
     badgeText: String? = null,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    windowSize: WindowWidthSizeClass
 ) {
+    val buttonWidth = when (windowSize) {
+        WindowWidthSizeClass.Compact -> 80.dp
+        WindowWidthSizeClass.Medium -> 100.dp
+        WindowWidthSizeClass.Expanded -> 120.dp
+        else -> 80.dp
+    }
+
     val backgroundColor = when {
         !enabled ->  MaterialTheme.colorScheme.secondary // Cambia colore se disabilitato
         isActive -> MaterialTheme.colorScheme.secondary
         else -> MaterialTheme.colorScheme.primary
     }
+
     val textColor = Color.White
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
+            .width(buttonWidth)
             .background(backgroundColor, shape = RoundedCornerShape(12.dp))
             .then(
                 if (enabled) Modifier.clickable { onClick() }

@@ -1,6 +1,7 @@
 package com.canapini_grasselli.app_sudoku.ui.navigation
 
 import android.os.Process
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,7 +18,7 @@ import com.canapini_grasselli.app_sudoku.views.StatisticsScreen
 import com.canapini_grasselli.app_sudoku.views.SudokuScreen
 
 @Composable
-fun Navigation(themeViewModel: ThemeViewModel, sudokuViewModel: SudokuViewModel) {
+fun Navigation(themeViewModel: ThemeViewModel, sudokuViewModel: SudokuViewModel, windowSize: WindowSizeClass) {
     val navController = rememberNavController()
     val navigationViewModel: NavigationViewModel = viewModel()
     val navigationEvent by navigationViewModel.navigationEvent.collectAsState()
@@ -62,7 +63,8 @@ fun Navigation(themeViewModel: ThemeViewModel, sudokuViewModel: SudokuViewModel)
         composable("game") {
             SudokuScreen(
                 viewModel = sudokuViewModel,
-                navController = navController
+                navController = navController,
+                windowSize = windowSize.widthSizeClass
                 )
         }
 

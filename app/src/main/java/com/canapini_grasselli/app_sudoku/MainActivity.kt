@@ -23,13 +23,19 @@ import com.canapini_grasselli.app_sudoku.ui.theme.App_SudokuTheme
 import com.canapini_grasselli.app_sudoku.ui.navigation.Navigation
 import kotlinx.coroutines.runBlocking
 import android.content.res.Configuration
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.core.view.WindowCompat
 
 class MainActivity : ComponentActivity() {
     private lateinit var sudokuViewModel: SudokuViewModel
     private lateinit var lifecycleObserver: LifecycleEventObserver
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         lifecycleObserver = LifecycleEventObserver { _, event ->
             when (event) {
@@ -51,6 +57,8 @@ class MainActivity : ComponentActivity() {
         lifecycle.addObserver(lifecycleObserver)
 
         setContent {
+            val windowSize = calculateWindowSizeClass(this)
+
             CompositionLocalProvider(
                 LocalViewModelStoreOwner provides this
             ) {
@@ -87,7 +95,9 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Navigation(
                             sudokuViewModel = sudokuViewModel,
-                            themeViewModel = themeViewModel)
+                            themeViewModel = themeViewModel,
+                            windowSize = windowSize
+                        )
                     }
                 }
             }

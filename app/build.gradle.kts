@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation (libs.kotlinx.coroutines.android)
     implementation (libs.androidx.lifecycle.common.java8)
+    implementation (libs.androidx.material3.window.size.class1)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
