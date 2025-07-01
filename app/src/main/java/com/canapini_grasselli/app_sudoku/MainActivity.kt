@@ -93,6 +93,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         lifecycle.removeObserver(lifecycleObserver)
@@ -105,7 +106,7 @@ class MainActivity : ComponentActivity() {
 
 //--vedere se funziona migrazione dati su un nuovo dispositivo
 //evedenzia numeri uguali a quello inserito
-//se un numero viene inserito in modo errato, rimane rosso anche se era nella posizione corretta
+//lag chiamata nuova partita
 //traccia audio nella home
 //mantieni stato partita in background (?)
 

@@ -228,27 +228,22 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
         if (notes) {
             setNote(row, col, number)
         } else {
-            val newGrid = currentState.grid.map { rowList ->
-                rowList.toMutableList()
-            }.toMutableList()
+            val newGrid = currentState.grid.map { it.toMutableList() }.toMutableList()
 
-            val newCell = newGrid[row][col].copy(value = number)
-            newGrid[row][col] = newCell
+            newGrid[row][col] = newGrid[row][col].copy(value = number)
 
-            // Valida la mossa
-            val isValid = isValidMove(newGrid, row, col, number)
-            newGrid[row][col] = newCell.copy(isValid = isValid)
+            val validatedGrid = validateAllCells(newGrid)
 
-            val newMistakes = if (!isValid && number != 0) {
+            val newMistakes = if (number != 0 && hasConflicts(validatedGrid, row, col, number)) {
                 currentState.mistakes + 1
             } else {
                 currentState.mistakes
             }
 
-            val isCompleted = checkIfCompleted(newGrid)
+            val isCompleted = checkIfCompleted(validatedGrid)
 
             _gameState.value = currentState.copy(
-                grid = newGrid,
+                grid = validatedGrid,
                 mistakes = newMistakes,
                 isCompleted = isCompleted
             )
@@ -265,6 +260,61 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
                 }
             }
         }
+    }
+
+    private fun validateAllCells(grid: List<List<SudokuCell>>): List<List<SudokuCell>> {
+        val newGrid = grid.map { it.toMutableList() }.toMutableList()
+
+        for (i in 0..8) {
+            for (j in 0..8) {
+                if (!newGrid[i][j].isFixed && newGrid[i][j].value != 0) {
+                    val isValid = !hasConflicts(newGrid, i, j, newGrid[i][j].value)
+                    newGrid[i][j] = newGrid[i][j].copy(isValid = isValid)
+                }
+            }
+        }
+
+        return newGrid
+    }
+
+    private fun hasConflicts(grid: List<List<SudokuCell>>, row: Int, col: Int, num: Int): Boolean {
+        if (num == 0) return false
+        var hasConflict = false
+
+        // Controllo riga
+        for (c in 0..8) {
+            if (c != col && grid[row][c].value == num) {
+                hasConflict = true
+                break
+            }
+        }
+
+        // Controllo colonna
+        if (!hasConflict) {
+            for (r in 0..8) {
+                if (r != row && grid[r][col].value == num) {
+                    hasConflict = true
+                    break
+                }
+            }
+        }
+
+        // Controllo box 3x3
+        if (!hasConflict) {
+            val boxRow = (row / 3) * 3
+            val boxCol = (col / 3) * 3
+            for (r in boxRow until boxRow + 3) {
+                for (c in boxCol until boxCol + 3) {
+                    if ((r != row || c != col) && grid[r][c].value == num) {
+                        hasConflict = true
+                        break
+                    }
+                }
+                if (hasConflict) break
+            }
+        }
+
+        return hasConflict
     }
 
     fun clearCell() {
@@ -307,33 +357,6 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
         }
     }
 
-
-
-    private fun isValidMove(grid: List<List<SudokuCell>>, row: Int, col: Int, num: Int): Boolean {
-        if (num == 0) return true
-
-        // Controllo riga
-        for (c in 0..8) {
-            if (c != col && grid[row][c].value == num) return false
-        }
-
-        // Controllo colonna
-        for (r in 0..8) {
-            if (r != row && grid[r][col].value == num) return false
-        }
-
-        // Controllo box 3x3
-        val boxRow = (row / 3) * 3
-        val boxCol = (col / 3) * 3
-        for (r in boxRow until boxRow + 3) {
-            for (c in boxCol until boxCol + 3) {
-                if ((r != row || c != col) && grid[r][c].value == num) return false
-            }
-        }
-
-        return true
-    }
-
     private fun checkIfCompleted(grid: List<List<SudokuCell>>): Boolean {
         for (row in 0..8) {
             for (col in 0..8) {
@@ -368,64 +391,28 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
         if (row == -1 || col == -1) return
         if (currentState.grid[row][col].isFixed) return
 
-        // Aggiorna il valore nella cella selezionata
-        val tempGrid = currentState.grid.mapIndexed { r, rowList ->
-            rowList.mapIndexed { c, cell ->
-                if (r == row && c == col) {
-                    cell.copy(value = number, isValid = true, isFixed = true, notes = 0)
-                } else {
-                    cell
-                }
+        val newGrid = currentState.grid.map { it.toMutableList() }.toMutableList()
+        newGrid[row][col] = newGrid[row][col].copy(
+            value = number,
+            isValid = true,
+            isFixed = true,
+            notes = 0
+        )
+
+        val validatedGrid = validateAllCells(newGrid)
+
+        // Conta i nuovi conflitti creati dall'hint
+        val newConflicts = validatedGrid.sumOf { gridRow ->
+            gridRow.count { cell ->
+                !cell.isFixed && !cell.isValid && cell.value == number
             }
         }
 
-        // Trova celle con lo stesso numero nella stessa riga, colonna e box 3x3 (esclude la cella suggerita)
-        val conflictingCells = mutableListOf<Pair<Int, Int>>()
-
-        // Riga
-        for (c in 0 until 9) {
-            if (c != col && tempGrid[row][c].value == number && !tempGrid[row][c].isFixed) {
-                conflictingCells.add(Pair(row, c))
-            }
-        }
-        // Colonna
-        for (r in 0 until 9) {
-            if (r != row && tempGrid[r][col].value == number && !tempGrid[r][col].isFixed) {
-                conflictingCells.add(Pair(r, col))
-            }
-        }
-        // Box 3x3
-        val startRow = (row / 3) * 3
-        val startCol = (col / 3) * 3
-        for (r in startRow until startRow + 3) {
-            for (c in startCol until startCol + 3) {
-                if ((r != row || c != col) &&
-                    tempGrid[r][c].value == number &&
-                    !tempGrid[r][c].isFixed
-                ) {
-                    conflictingCells.add(Pair(r, c))
-                }
-            }
-        }
-
-        // Aggiorna le celle in conflitto per diventare rosse
-        val newGrid = tempGrid.mapIndexed { r, rowList ->
-            rowList.mapIndexed { c, cell ->
-                if (conflictingCells.contains(Pair(r, c))) {
-                    cell.copy(isValid = false)
-                } else {
-                    cell
-                }
-            }
-        }
-
-        val newMistakes = currentState.mistakes + conflictingCells.size
-
-        val isCompleted = checkIfCompleted(newGrid)
+        val isCompleted = checkIfCompleted(validatedGrid)
 
         _gameState.value = currentState.copy(
-            grid = newGrid,
-            mistakes = newMistakes,
+            grid = validatedGrid,
+            mistakes = currentState.mistakes + newConflicts,
             isCompleted = isCompleted,
             hintLeft = currentState.hintLeft - 1
         )
