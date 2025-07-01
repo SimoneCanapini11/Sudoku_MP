@@ -420,7 +420,6 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                     .fillMaxWidth()
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
-                //horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 if (gameState.isCompleted) {
                         Text(
@@ -547,12 +546,65 @@ fun SudokuGrid(
                 for (row in 0..8) {
                     Row {
                         for (col in 0..8) {
+                            val currentCell = gameState.grid[row][col]
+
+                            val hasSameNumber = if (gameState.selectedRow >= 0 && gameState.selectedCol >= 0) {
+                                val selectedCell = gameState.grid[gameState.selectedRow][gameState.selectedCol]
+                                selectedCell.value != 0 &&
+                                        currentCell.value == selectedCell.value &&
+                                        (row != gameState.selectedRow || col != gameState.selectedCol)
+                            } else {
+                                false
+                            }
+
+                            val hasConflict = if (currentCell.value != 0 && !currentCell.isValid) {
+                                var found = false
+
+                                // Controllo riga
+                                for (c in 0..8) {
+                                    if (c != col && gameState.grid[row][c].value == currentCell.value && !gameState.grid[row][c].isValid) {
+                                        found = true
+                                        break
+                                    }
+                                }
+                                // Controllo colonna
+                                if (!found) {
+                                    for (r in 0..8) {
+                                        if (r != row && gameState.grid[r][col].value == currentCell.value && !gameState.grid[r][col].isValid) {
+                                            found = true
+                                            break
+                                        }
+                                    }
+                                }
+                                // Controllo box 3x3
+                                if (!found) {
+                                    val boxRow = (row / 3) * 3
+                                    val boxCol = (col / 3) * 3
+                                    for (r in boxRow until boxRow + 3) {
+                                        for (c in boxCol until boxCol + 3) {
+                                            if ((r != row || c != col) &&
+                                                gameState.grid[r][c].value == currentCell.value &&
+                                                !gameState.grid[r][c].isValid) {
+                                                found = true
+                                                break
+                                            }
+                                        }
+                                        if (found) break
+                                    }
+                                }
+                                found
+                            } else {
+                                false
+                            }
+
                             SudokuCell(
-                                cell = gameState.grid[row][col],
+                                cell = currentCell,
                                 isSelected = gameState.selectedRow == row && gameState.selectedCol == col,
                                 isInSameRow = gameState.selectedRow == row,
                                 isInSameCol = gameState.selectedCol == col,
                                 isInSameBox = isInSameBox(row, col, gameState.selectedRow, gameState.selectedCol),
+                                hasSameNumber = hasSameNumber,
+                                hasConflict = hasConflict,
                                 onClick = { onCellClick(row, col) },
                                 modifier = Modifier.weight(1f),
                                 isGameCompleted = gameState.isCompleted
@@ -606,12 +658,16 @@ fun SudokuCell(
     isInSameRow: Boolean,
     isInSameCol: Boolean,
     isInSameBox: Boolean,
+    hasSameNumber: Boolean,
+    hasConflict: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isGameCompleted: Boolean = false
 ) {
     val backgroundColor = when {
         isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+        hasConflict -> Color.Red.copy(alpha = 0.2f)
+        hasSameNumber -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
         isInSameRow || isInSameCol || isInSameBox -> MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
         cell.isFixed -> MaterialTheme.colorScheme.surfaceVariant
         else -> MaterialTheme.colorScheme.surface

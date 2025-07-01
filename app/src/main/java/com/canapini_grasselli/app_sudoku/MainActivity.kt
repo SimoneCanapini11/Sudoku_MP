@@ -105,7 +105,6 @@ class MainActivity : ComponentActivity() {
 
 
 //--vedere se funziona migrazione dati su un nuovo dispositivo
-//evedenzia numeri uguali a quello inserito
 //lag chiamata nuova partita
 //traccia audio nella home
 //mantieni stato partita in background (?)
