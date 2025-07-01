@@ -7,6 +7,7 @@ import com.canapini_grasselli.app_sudoku.data.local.GameRepository
 import com.canapini_grasselli.app_sudoku.data.local.SudokuGameMapper
 import com.canapini_grasselli.app_sudoku.data.preferences.ThemePreferences
 import com.canapini_grasselli.app_sudoku.data.remote.SudokuApiClient
+import com.canapini_grasselli.app_sudoku.views.toDifficultyStringResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -155,7 +156,9 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
 
     private fun saveCompletedGame() {
         viewModelScope.launch {
-            val currentGame = _gameState.value.copy(isCompleted = true)
+            val currentGame = _gameState.value.copy(
+                isCompleted = true,
+                timestamp = System.currentTimeMillis())
             val gameEntity = SudokuGameMapper.fromDomain(currentGame)
             repository.saveSudokuGame(gameEntity)
             _canLoadGame.value = false
@@ -329,11 +332,17 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
             try {
                 _isLoading.value = true
                 stopTimer() // Ferma il timer esistente
+
+                // Salva solo se il gioco corrente è completato
+                if (_gameState.value.isCompleted) {
+                    saveGame()
+                }
+
                 val response = SudokuApiClient.service.getSudoku()
                 val apiGrid = response.newboard.grids.first()
                 val values = apiGrid.value
                 val solution = apiGrid.solution
-                val difficulty = apiGrid.difficulty
+                val difficulty = apiGrid.difficulty.toDifficultyStringResource()
 
                 // Trasforma la griglia dell’API nel modello di dati SudokuCell
                 val newGrid = values.map { row ->
@@ -500,6 +509,7 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
         // Aggiorna lo stato del gioco
         _gameState.value = currentState.copy(grid = newGrid)
     }
+
 
     //Pulisci il timer quando il ViewModel viene distrutto
     override fun onCleared() {

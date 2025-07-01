@@ -40,7 +40,6 @@ import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
 import com.canapini_grasselli.app_sudoku.ui.theme.Blue40
 import com.canapini_grasselli.app_sudoku.ui.theme.Green40
 import com.canapini_grasselli.app_sudoku.ui.theme.Purple40
-import java.util.Locale
 
 //Schermata Home
 @Composable
@@ -509,16 +508,19 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                             style = MaterialTheme.typography.titleMedium
                         )
 
-                        Text(
-                            text = stringResource(
-                                R.string.difficulty,
-                                gameState.difficulty.replaceFirstChar {
-                                    if (it.isLowerCase()) it.titlecase(Locale.ROOT)
-                                    else it.toString()
-                                }
-                            ),
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.difficulty) + " ",
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Text(
+                                text = stringResource(id = gameState.difficulty),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
                     }
                 }
 

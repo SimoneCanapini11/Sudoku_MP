@@ -114,15 +114,3 @@ class MainActivity : ComponentActivity() {
 }
 
 
-//--vedere se funziona migrazione dati su un nuovo dispositivo
-//traccia audio nella home
-
-/*
-1.      Una interfaccia utente ben fatta!
-2.      Un database dei risultati precedenti
-·       Partire giocate
-·       Partite vinte (terminate)
-·       Miglior Tempo
-L'interfaccia dovrà inoltre implementare il massimo degli aiuti possibili all'utente tra cui almeno uno:
-·       Appunti utente per ognuna delle 81 celle
-*/

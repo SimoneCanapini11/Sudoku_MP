@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="errors">Errori: %1$s</string>
-    <string name="difficulty">Difficoltà: %1$s</string>
+    <string name="difficulty">Difficoltà:</string>
     <string name="hints">Aiuto</string>
     <string name="new_game">Nuovo Gioco</string>
     <string name="game_completed_you_win">Partita Terminata: Hai vinto</string>
@@ -32,5 +32,6 @@
     <string name="hard_difficulty">Difficile</string>
     <string name="completion_time">Tempo: %s</string>
     <string name="perfect_wins">Vittorie senza errori</string>
-    <string name="loading_new_game">Generazione nuova partita...</string>
+    <string name="loading_new_game">Generazione nuova partita…</string>
+    <string name="difficulty_unknown">Sconosciuta</string>
 </resources>

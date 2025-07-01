@@ -1,5 +1,7 @@
 package com.canapini_grasselli.app_sudoku.model
 
+import androidx.annotation.StringRes
+
 
 data class SudokuCell(
     val value: Int = 0,
@@ -15,7 +17,7 @@ data class SudokuGame(
     val selectedCol: Int = -1,
     val isCompleted: Boolean = false,
     val mistakes: Int = 0,
-    val difficulty: String = "",
+    @StringRes val difficulty: Int = 0,
     val solution: List<List<Int>> = emptyList(),
     val timerSeconds: Int = 0,
     val hintLeft: Int = 3,
