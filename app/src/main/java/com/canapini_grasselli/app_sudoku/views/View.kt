@@ -849,7 +849,7 @@ fun NumberButton(
         onClick = onClick,
         modifier = Modifier.size(size),
         shape = RoundedCornerShape(8.dp),
-        contentPadding = PaddingValues(0.dp) //padding per centrare il numero
+        contentPadding = PaddingValues(0.dp)
     ) {
         Text(
             text = number.toString(),
@@ -1078,7 +1078,6 @@ fun StatisticsScreen(
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = 35.sp
             )
-            // Spazio vuoto per centrare il titolo
             Spacer(modifier = Modifier.width(48.dp))
         }
 
