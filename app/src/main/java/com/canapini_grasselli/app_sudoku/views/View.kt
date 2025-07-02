@@ -408,7 +408,6 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
     Box(modifier = Modifier
         .fillMaxSize()
         .systemBarsPadding()
-        .padding(top = 10.dp)
     ) {
         if (!isLoading) {
             Column(
