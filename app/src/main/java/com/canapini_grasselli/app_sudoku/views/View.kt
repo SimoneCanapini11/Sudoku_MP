@@ -958,7 +958,7 @@ fun ActionButton(
     }
 
     val backgroundColor = when {
-        !enabled ->  MaterialTheme.colorScheme.secondary // Cambia colore se disabilitato
+        !enabled ->  MaterialTheme.colorScheme.secondary
         isActive -> MaterialTheme.colorScheme.secondary
         else -> MaterialTheme.colorScheme.primary
     }
