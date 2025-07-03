@@ -24,12 +24,12 @@ interface SudokuGameDao {
     suspend fun getPerfectWins(): Int
 
     // Best times per difficoltà
-    @Query("SELECT MIN(timerSeconds) FROM sudoku_games WHERE isCompleted = 1 AND difficulty = 'Easy'")
+    @Query("SELECT MIN(timerSeconds) FROM sudoku_games WHERE isCompleted = 1 AND LOWER(difficulty) = LOWER('Easy')")
     suspend fun getBestTimeEasy(): Int?
 
-    @Query("SELECT MIN(timerSeconds) FROM sudoku_games WHERE isCompleted = 1 AND difficulty = 'Medium'")
+    @Query("SELECT MIN(timerSeconds) FROM sudoku_games WHERE isCompleted = 1 AND LOWER(difficulty) = LOWER('Medium')")
     suspend fun getBestTimeMedium(): Int?
 
-    @Query("SELECT MIN(timerSeconds) FROM sudoku_games WHERE isCompleted = 1 AND difficulty = 'Hard'")
+    @Query("SELECT MIN(timerSeconds) FROM sudoku_games WHERE isCompleted = 1 AND LOWER(difficulty) = LOWER('Hard')")
     suspend fun getBestTimeHard(): Int?
 }
