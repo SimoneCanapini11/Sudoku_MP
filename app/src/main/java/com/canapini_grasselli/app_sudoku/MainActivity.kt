@@ -116,6 +116,5 @@ class MainActivity : ComponentActivity() {
 
 //gestione chiamata offline api
 //gestione errore chiamata api (toast?)
-//Errore salvataggio dati a fine partita
 //eliminare hints left e difficulty in sudoku screen
 

@@ -166,12 +166,27 @@ class SudokuViewModel (private val repository: GameRepository, private val sudok
 
     private fun saveCompletedGame() {
         viewModelScope.launch {
-            val currentGame = _gameState.value.copy(
-                isCompleted = true,
-                timestamp = System.currentTimeMillis())
-            val gameEntity = SudokuGameMapper.fromDomain(currentGame)
-            repository.saveSudokuGame(gameEntity)
-            _canLoadGame.value = false
+            try {
+                Log.d("SudokuViewModel", "Saving completed game")
+                val currentGame = _gameState.value.copy(
+                    isCompleted = true,
+                    timestamp = System.currentTimeMillis()
+                )
+                val gameEntity = SudokuGameMapper.fromDomain(currentGame)
+
+                if (currentGame.id != 0L) {
+                    Log.d("SudokuViewModel", "Updating completed game with ID: ${currentGame.id}")
+                    repository.updateSudokuGame(gameEntity)
+                } else {
+                    Log.d("SudokuViewModel", "Saving new completed game")
+                    repository.saveSudokuGame(gameEntity)
+                }
+
+                _canLoadGame.value = false
+                Log.d("SudokuViewModel", "Game saved successfully")
+            } catch (e: Exception) {
+                Log.e("SudokuViewModel", "Error saving completed game", e)
+            }
         }
     }
 
@@ -268,12 +283,6 @@ class SudokuViewModel (private val repository: GameRepository, private val sudok
             if (isCompleted) {
                 stopTimer()
                 saveCompletedGame()
-                viewModelScope.launch {
-                    val completedGame = _gameState.value
-                    val gameEntity = SudokuGameMapper.fromDomain(completedGame)
-                    repository.saveSudokuGame(gameEntity)
-                    _canLoadGame.value = false
-                }
             }
         }
     }
@@ -343,10 +352,10 @@ class SudokuViewModel (private val repository: GameRepository, private val sudok
                 _isLoading.value = true
                 stopTimer()
 
-                // Salva solo se il gioco corrente è completato
+                /*// Salva solo se il gioco corrente è completato
                 if (_gameState.value.isCompleted) {
                     saveGame()
-                }
+                }*/
 
                 val game = sudokuRepository.getGameWithDifficulty(difficulty)
                 _gameState.value = game
@@ -426,12 +435,6 @@ class SudokuViewModel (private val repository: GameRepository, private val sudok
         if (isCompleted) {
             stopTimer()
             saveCompletedGame()
-            viewModelScope.launch {
-                val completedGame = _gameState.value
-                val gameEntity = SudokuGameMapper.fromDomain(completedGame)
-                repository.saveSudokuGame(gameEntity)
-                _canLoadGame.value = false
-            }
         }
     }
 
