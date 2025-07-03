@@ -47,8 +47,8 @@ fun Navigation(themeViewModel: ThemeViewModel, sudokuViewModel: SudokuViewModel,
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
             HomeScreen(
-                onNavigateToGame = {
-                    sudokuViewModel.generateNewGame()
+                onNavigateToGame = { difficulty ->
+                    sudokuViewModel.generateNewGame(difficulty)
                     navigationViewModel.onNewGameClick() },
                 onNavigateToLoadGame = {
                     sudokuViewModel.loadLastGame()

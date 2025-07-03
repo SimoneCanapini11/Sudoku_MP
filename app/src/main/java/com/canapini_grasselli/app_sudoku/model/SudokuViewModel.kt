@@ -6,8 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.canapini_grasselli.app_sudoku.data.local.GameRepository
 import com.canapini_grasselli.app_sudoku.data.local.SudokuGameMapper
 import com.canapini_grasselli.app_sudoku.data.preferences.ThemePreferences
-import com.canapini_grasselli.app_sudoku.data.remote.SudokuApiClient
-import com.canapini_grasselli.app_sudoku.views.toDifficultyStringResource
+import com.canapini_grasselli.app_sudoku.data.local.SudokuRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -114,12 +113,14 @@ class NavigationViewModel : ViewModel() {
     }
 }
 
-class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
+class SudokuViewModel (private val repository: GameRepository, private val sudokuRepository: SudokuRepository) : ViewModel() {
 
     private val _gameState = MutableStateFlow(SudokuGame())
     val gameState: StateFlow<SudokuGame> = _gameState.asStateFlow()
     private var _canLoadGame = MutableStateFlow(false)
     val canLoadGame: StateFlow<Boolean> = _canLoadGame.asStateFlow()
+    private val _loadingState = MutableStateFlow<LoadingState>(LoadingState.Idle)
+    val loadingState: StateFlow<LoadingState> = _loadingState.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -127,7 +128,16 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
     private var timerJob: Job? = null
 
     init {
-        generateNewGame()
+        viewModelScope.launch {
+            _loadingState.value = LoadingState.Preloading
+            try {
+                sudokuRepository.preloadGames()
+                _loadingState.value = LoadingState.Idle
+            } catch (e: Exception) {
+                _loadingState.value = LoadingState.Error("Error preloading games")
+                Log.e("SudokuViewModel", "Error preloading games", e)
+            }
+        }
         checkSavedGame()
     }
 
@@ -327,50 +337,26 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
         setNumber(0)
     }
 
-    fun generateNewGame() {
+    fun generateNewGame(difficulty: String) {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                stopTimer() // Ferma il timer esistente
+                stopTimer()
 
                 // Salva solo se il gioco corrente è completato
                 if (_gameState.value.isCompleted) {
                     saveGame()
                 }
 
-                val response = SudokuApiClient.service.getSudoku()
-                val apiGrid = response.newboard.grids.first()
-                val values = apiGrid.value
-                val solution = apiGrid.solution
-                val difficulty = apiGrid.difficulty.toDifficultyStringResource()
-
-                // Trasforma la griglia dell’API nel modello di dati SudokuCell
-                val newGrid = values.map { row ->
-                    row.map { value ->
-                        SudokuCell(
-                            value = if (value == 0) 0 else value,
-                            isFixed = value != 0,
-                            isValid = true
-                        )
-                    }
-                }
-
-                _gameState.value = SudokuGame(
-                    grid = newGrid,
-                    selectedRow = -1,
-                    selectedCol = -1,
-                    isCompleted = false,
-                    mistakes = 0,
-                    difficulty = difficulty,
-                    solution = solution,
-                    hintLeft = 3,
-                    timerSeconds = 0, // Reset timer
-                    timestamp = System.currentTimeMillis()
-                )
+                val game = sudokuRepository.getGameWithDifficulty(difficulty)
+                _gameState.value = game
                 startTimer()
                 checkSavedGame()
+                _loadingState.value = LoadingState.Idle
+
             } catch (e: Exception) {
                 Log.e("SudokuViewModel", "Error generating new game", e)
+                _loadingState.value = LoadingState.Error("Could not generate game with difficulty $difficulty. Please try again.")
             } finally {
                 _isLoading.value = false
             }
@@ -510,6 +496,11 @@ class SudokuViewModel (private val repository: GameRepository) : ViewModel() {
         _gameState.value = currentState.copy(grid = newGrid)
     }
 
+    sealed class LoadingState {
+        data object Idle : LoadingState()
+        data object Preloading : LoadingState()
+        data class Error(val message: String) : LoadingState()
+    }
 
     //Pulisci il timer quando il ViewModel viene distrutto
     override fun onCleared() {

@@ -2,6 +2,7 @@ package com.canapini_grasselli.app_sudoku.views
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,7 +28,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavController
@@ -44,17 +48,19 @@ import com.canapini_grasselli.app_sudoku.ui.theme.Purple40
 //Schermata Home
 @Composable
 fun HomeScreen(
-    onNavigateToGame: () -> Unit,
+    onNavigateToGame: (String) -> Unit,
     onNavigateToLoadGame: () -> Unit,
     onNavigateToStats: () -> Unit,
     onExit: () -> Unit,
-    themeViewModel: ThemeViewModel, //Per cambiare font
+    themeViewModel: ThemeViewModel,
     viewModel: SudokuViewModel = viewModel()
 ) {
     var showExitDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
+    var showDifficultyDialog by remember { mutableStateOf(false) }
     val currentTheme by themeViewModel.currentTheme.collectAsState()
     val canLoadGame by viewModel.canLoadGame.collectAsState()
+    val loadingState by viewModel.loadingState.collectAsState()
 
     BackHandler {
         showExitDialog = true
@@ -72,131 +78,51 @@ fun HomeScreen(
                 )
             },
             text = {
-                Column (modifier = Modifier.fillMaxWidth()) {
+                Column (
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp))
+                {
+                    // Tema viola
+                    ThemeOption(
+                        theme = AppTheme.PURPLE,
+                        currentTheme = currentTheme,
+                        themeRes = R.string.purple_theme,
+                        color = Purple40,
+                        onSelect = {
+                            themeViewModel.setTheme(AppTheme.PURPLE)
+                            showThemeDialog = false
+                        }
+                    )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    // Tema verde
+                    ThemeOption(
+                        theme = AppTheme.GREEN,
+                        currentTheme = currentTheme,
+                        themeRes = R.string.green_theme,
+                        color = Green40,
+                        onSelect = {
+                            themeViewModel.setTheme(AppTheme.GREEN)
+                            showThemeDialog = false
+                        }
+                    )
 
-                    //Tema viola
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                themeViewModel.setTheme(AppTheme.PURPLE)
-                                showThemeDialog = false
-                            }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                        RadioButton(
-                            selected = currentTheme == AppTheme.PURPLE,
-                            onClick = {
-                                themeViewModel.setTheme(AppTheme.PURPLE)
-                                showThemeDialog = false
-                            }
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            stringResource(R.string.purple_theme),
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.Medium)
-                    }
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .background(Purple40, CircleShape)
-                                    .border(1.dp, Color.Gray, CircleShape)
-                            )
+                    // Tema blu
+                    ThemeOption(
+                        theme = AppTheme.BLUE,
+                        currentTheme = currentTheme,
+                        themeRes = R.string.blue_theme,
+                        color = Blue40,
+                        onSelect = {
+                            themeViewModel.setTheme(AppTheme.BLUE)
+                            showThemeDialog = false
                         }
-                    }
-
-                    //Tema verde
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                themeViewModel.setTheme(AppTheme.GREEN)
-                                showThemeDialog = false
-                            }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = currentTheme == AppTheme.GREEN,
-                                onClick = {
-                                    themeViewModel.setTheme(AppTheme.GREEN)
-                                    showThemeDialog = false
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                stringResource(R.string.green_theme),
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Medium)
-                        }
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .background(Green40, CircleShape)
-                                    .border(1.dp, Color.Gray, CircleShape)
-                            )
-                        }
-                    }
-                    //Tema blu
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                themeViewModel.setTheme(AppTheme.BLUE)
-                                showThemeDialog = false
-                            }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = currentTheme == AppTheme.BLUE,
-                                onClick = {
-                                    themeViewModel.setTheme(AppTheme.BLUE)
-                                    showThemeDialog = false
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                stringResource(R.string.blue_theme),
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Medium)
-                        }
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .background(Blue40, CircleShape)
-                                    .border(1.dp, Color.Gray, CircleShape)
-                            )
-                        }
-                    }
+                    )
                 }
             },
-            confirmButton = { }
+            confirmButton = { },
+            shape = RoundedCornerShape(24.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 8.dp
         )
     }
 
@@ -236,6 +162,19 @@ fun HomeScreen(
                     }
                 }
             }
+        )
+    }
+
+    // Dialog per la selezione della difficoltà
+    if (showDifficultyDialog) {
+        DifficultySelectionDialog(
+            onDifficultySelected = { difficulty ->
+                viewModel.generateNewGame(difficulty)
+                onNavigateToGame(difficulty)
+                showDifficultyDialog = false
+
+            },
+            onDismiss = { showDifficultyDialog = false }
         )
     }
 
@@ -301,12 +240,20 @@ fun HomeScreen(
 
             // Bottoni principali
             Button(
-                onClick = onNavigateToGame ,
+                onClick = { showDifficultyDialog = true },
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
-                    .height(56.dp)
+                    .height(56.dp),
+                enabled = loadingState != SudokuViewModel.LoadingState.Preloading
             ) {
-                Text(stringResource(R.string.new_sudoku_game), fontSize = 18.sp)
+                if (loadingState == SudokuViewModel.LoadingState.Preloading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(stringResource(R.string.new_sudoku_game), fontSize = 18.sp)
+                }
             }
 
             Button(
@@ -322,8 +269,8 @@ fun HomeScreen(
                 Text(stringResource(
                     R.string.cont_game),
                     fontSize = 18.sp,
-                     color = if (canLoadGame) MaterialTheme.colorScheme.onPrimary
-                     else MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
+                    color = if (canLoadGame) MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
                 )
             }
 
@@ -545,7 +492,9 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                         }
                     },
                     isCompleted = gameState.isCompleted,
-                    onNewGame = { viewModel.generateNewGame() },
+                    onNewGame = {
+                        val currentDifficulty = gameState.difficulty.fromDifficultyResourceToString()
+                        viewModel.generateNewGame(currentDifficulty) },
                     windowSize = windowSize
                 )
             }
@@ -1211,6 +1160,48 @@ private fun StatisticItem(
     }
 }
 
+
+@Composable
+private fun ThemeOption(
+    theme: AppTheme,
+    currentTheme: AppTheme,
+    @StringRes themeRes: Int,
+    color: Color,
+    onSelect: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onSelect)
+            .padding(vertical = 8.dp, horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            RadioButton(
+                selected = currentTheme == theme,
+                onClick = onSelect
+            )
+            Text(
+                text = stringResource(themeRes),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Medium,
+                fontSize = 18.sp
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .background(color, CircleShape)
+                .border(0.5.dp, Color.Gray.copy(alpha = 0.3f), CircleShape)
+        )
+    }
+}
+
 @Composable
 private fun DifficultyTimeItem(
     difficulty: String,
@@ -1250,6 +1241,83 @@ private fun DifficultyTimeItem(
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = color
+        )
+    }
+}
+
+@Composable
+fun DifficultySelectionDialog(
+    onDifficultySelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.select_difficulty),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 26.sp,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                DifficultyOption(
+                    difficultyRes = R.string.easy_difficulty,
+                    icon = Icons.Default.Star,
+                    onClick = { onDifficultySelected("easy") }
+                )
+                DifficultyOption(
+                    difficultyRes = R.string.medium_difficulty,
+                    icon = Icons.Default.Star,
+                    onClick = { onDifficultySelected("medium") }
+                )
+                DifficultyOption(
+                    difficultyRes = R.string.hard_difficulty,
+                    icon = Icons.Default.Star,
+                    onClick = { onDifficultySelected("hard") }
+                )
+            }
+        },
+        confirmButton = { },
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 8.dp
+    )
+}
+
+@Composable
+private fun DifficultyOption(
+    @StringRes difficultyRes: Int,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp, horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = when (stringResource(id = difficultyRes)) {
+                stringResource(R.string.easy_difficulty) -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                stringResource(R.string.medium_difficulty) -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                else -> MaterialTheme.colorScheme.primary
+            }
+        )
+        Text(
+            text = stringResource(id = difficultyRes),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            fontSize = 18.sp
         )
     }
 }

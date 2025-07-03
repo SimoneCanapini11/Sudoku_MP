@@ -36,4 +36,5 @@
     <string name="perfect_wins">Perfect Wins</string>
     <string name="loading_new_game">Loading new game…</string>
     <string name="difficulty_unknown">Unknown</string>
+    <string name="select_difficulty">Select Difficulty</string>
 </resources>
