@@ -65,18 +65,14 @@ class SudokuRepository {
                 val game = apiGrid.toSudokuGame()
 
                 if (game.difficulty.fromDifficultyResourceToString() == difficulty.lowercase()) {
-                    coroutineScope {
-                        launch {
-                            preloadGames()
-                        }
-                    }
                     return game
-                }
+                } else {
                     when (game.difficulty.fromDifficultyResourceToString()) {
                         "easy" -> if (easyGames.size < preloadSize) easyGames.add(game)
                         "medium" -> if (mediumGames.size < preloadSize) mediumGames.add(game)
                         "hard" -> if (hardGames.size < preloadSize) hardGames.add(game)
                     }
+                }
             } catch (e: Exception) {
                 Log.e("SudokuRepository", "Error fetching game", e)
             }
