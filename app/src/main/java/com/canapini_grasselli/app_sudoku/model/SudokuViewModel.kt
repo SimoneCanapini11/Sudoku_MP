@@ -121,6 +121,8 @@ class SudokuViewModel (private val repository: GameRepository, private val sudok
     val canLoadGame: StateFlow<Boolean> = _canLoadGame.asStateFlow()
     private val _loadingState = MutableStateFlow<LoadingState>(LoadingState.Idle)
     val loadingState: StateFlow<LoadingState> = _loadingState.asStateFlow()
+    private val _isNetworkAvailable = MutableStateFlow(true)
+    val isNetworkAvailable: StateFlow<Boolean> = _isNetworkAvailable.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -384,7 +386,7 @@ class SudokuViewModel (private val repository: GameRepository, private val sudok
             if (currentState.grid[row][col].isFixed) return
 
             val correctNumber = solution[row][col]
-            setHint(correctNumber) // Usa una diversa logica dell'inserimento per suggerire un numero
+            setHint(correctNumber)
 
     }
 
@@ -479,8 +481,6 @@ class SudokuViewModel (private val repository: GameRepository, private val sudok
         // Crea una nuova griglia per mantenere l'immutabilità
         val newGrid = currentState.grid.map { it.toMutableList() }.toMutableList()
 
-        // Se la nota è uguale al numero del valore della cella, la rimuoviamo (metti 0)
-        // altrimenti, impostiamo la nuova nota
         val newNote = if (currentCell.value == number) 0 else number
 
         // Aggiorna la cella con la nuova nota
@@ -488,6 +488,16 @@ class SudokuViewModel (private val repository: GameRepository, private val sudok
 
         // Aggiorna lo stato del gioco
         _gameState.value = currentState.copy(grid = newGrid)
+    }
+
+    // Funzione per aggiornare lo stato della rete
+    fun updateNetworkStatus(isAvailable: Boolean) {
+        viewModelScope.launch {
+            _isNetworkAvailable.value = isAvailable
+            if (!isAvailable) {
+                _loadingState.value = LoadingState.Error("Check your internet connection.")
+            }
+        }
     }
 
     sealed class LoadingState {

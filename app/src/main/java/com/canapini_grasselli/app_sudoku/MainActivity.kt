@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                         @Deprecated("Deprecated in Java")
                         override fun onLowMemory() {}
                         override fun onTrimMemory(level: Int) {
-                            if (level >= ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+                            if (level >= TRIM_MEMORY_UI_HIDDEN) {
                                 runBlocking {
                                     sudokuViewModel.saveGameOnExit()
                                 }
@@ -114,7 +114,4 @@ class MainActivity : ComponentActivity() {
 }
 
 
-//gestione chiamata offline api
-//gestione errore chiamata api (toast?)
-//eliminare hints left e difficulty in sudoku screen
 

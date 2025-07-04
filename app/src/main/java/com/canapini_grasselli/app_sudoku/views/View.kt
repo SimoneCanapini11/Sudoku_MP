@@ -44,6 +44,8 @@ import com.canapini_grasselli.app_sudoku.model.ThemeViewModel
 import com.canapini_grasselli.app_sudoku.ui.theme.Blue40
 import com.canapini_grasselli.app_sudoku.ui.theme.Green40
 import com.canapini_grasselli.app_sudoku.ui.theme.Purple40
+import com.canapini_grasselli.app_sudoku.utils.NetworkConnectivityManager
+import com.canapini_grasselli.app_sudoku.utils.StringResources
 
 //Schermata Home
 @Composable
@@ -55,15 +57,31 @@ fun HomeScreen(
     themeViewModel: ThemeViewModel,
     viewModel: SudokuViewModel = viewModel()
 ) {
+    NetworkConnectivityManager(viewModel)
+
     var showExitDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
     var showDifficultyDialog by remember { mutableStateOf(false) }
+
     val currentTheme by themeViewModel.currentTheme.collectAsState()
     val canLoadGame by viewModel.canLoadGame.collectAsState()
     val loadingState by viewModel.loadingState.collectAsState()
+    val isNetworkAvailable by viewModel.isNetworkAvailable.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val networkErrorMessage = stringResource(StringResources.CHECK_CONN_RES)
 
     BackHandler {
         showExitDialog = true
+    }
+
+    // Gestione assenza di connessione
+    LaunchedEffect(isNetworkAvailable) {
+        if (!isNetworkAvailable) {
+            snackbarHostState.showSnackbar(
+                message = networkErrorMessage,
+                duration = SnackbarDuration.Indefinite
+            )
+        }
     }
 
     // Selezione del font
@@ -178,109 +196,149 @@ fun HomeScreen(
         )
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
-    ) {
-        // Top bar con bottoni Font e Esci
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Bottone Esci
-            IconButton(
-                onClick = { showExitDialog = true }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_exit_to_app),
-                    contentDescription = "Exit_to_app",
-                    modifier = Modifier.size(50.dp)
-                )
-            }
-
-            // Bottone Font
-            IconButton(
-                onClick = { showThemeDialog = true }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_color),
-                    contentDescription = "Font",
-                    modifier = Modifier.size(50.dp)
-                )
-            }
-        }
-
-        // Contenuto centrale con logo e bottoni
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.sudoku_title),
-                style = MaterialTheme.typography.displayMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-
-            // Logo
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo App",
-                modifier = Modifier.size(200.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Bottoni principali
-            Button(
-                onClick = { showDifficultyDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth(0.85f)
-                    .height(56.dp),
-                enabled = loadingState != SudokuViewModel.LoadingState.Preloading
-            ) {
-                if (loadingState == SudokuViewModel.LoadingState.Preloading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { snackbarData ->
+                    Snackbar(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier.padding(16.dp),
+                        content = {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = snackbarData.visuals.message,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
                     )
-                } else {
-                    Text(stringResource(R.string.new_sudoku_game), fontSize = 18.sp)
+                }
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+        ) {
+            // Top bar con bottoni Font e Esci
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Bottone Esci
+                IconButton(
+                    onClick = { showExitDialog = true }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_exit_to_app),
+                        contentDescription = "Exit_to_app",
+                        modifier = Modifier.size(50.dp)
+                    )
+                }
+
+                // Bottone Font
+                IconButton(
+                    onClick = { showThemeDialog = true }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_color),
+                        contentDescription = "Font",
+                        modifier = Modifier.size(50.dp)
+                    )
                 }
             }
 
-            Button(
-                onClick = onNavigateToLoadGame ,
+            // Contenuto centrale con logo e bottoni
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.85f)
-                    .height(56.dp),
-                enabled = canLoadGame, // Disabilita il bottone se non c'è partita salvata
-                colors = ButtonDefaults.buttonColors(
-                    disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                )
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                Text(stringResource(
-                    R.string.cont_game),
-                    fontSize = 18.sp,
-                    color = if (canLoadGame) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
+                Text(
+                    text = stringResource(R.string.sudoku_title),
+                    style = MaterialTheme.typography.displayMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 24.dp)
                 )
-            }
 
-            Button(
-                onClick = onNavigateToStats ,
-                modifier = Modifier
-                    .fillMaxWidth(0.85f)
-                    .height(56.dp)
-            ) {
-                Text(stringResource(R.string.statistics), fontSize = 18.sp)
+                // Logo
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Logo App",
+                    modifier = Modifier.size(200.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Bottoni principali
+                Button(
+                    onClick = { showDifficultyDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth(0.85f)
+                        .height(56.dp),
+                    enabled = isNetworkAvailable && loadingState != SudokuViewModel.LoadingState.Preloading,
+                    colors = ButtonDefaults.buttonColors(
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                    )
+                ) {
+                    if (loadingState == SudokuViewModel.LoadingState.Preloading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.new_sudoku_game),
+                            fontSize = 18.sp,
+                            color = if (isNetworkAvailable)
+                                MaterialTheme.colorScheme.onPrimary
+                            else
+                                MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
+                        )
+                    }
+                }
+
+                Button(
+                    onClick = onNavigateToLoadGame,
+                    modifier = Modifier
+                        .fillMaxWidth(0.85f)
+                        .height(56.dp),
+                    enabled = canLoadGame, // Disabilita il bottone se non c'è partita salvata
+                    colors = ButtonDefaults.buttonColors(
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                    )
+                ) {
+                    Text(
+                        stringResource(
+                            R.string.cont_game
+                        ),
+                        fontSize = 18.sp,
+                        color = if (canLoadGame) MaterialTheme.colorScheme.onPrimary
+                        else MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
+                    )
+                }
+
+                Button(
+                    onClick = onNavigateToStats,
+                    modifier = Modifier
+                        .fillMaxWidth(0.85f)
+                        .height(56.dp)
+                ) {
+                    Text(stringResource(R.string.statistics), fontSize = 18.sp)
+                }
             }
         }
     }
@@ -294,6 +352,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
     val isLoading by viewModel.isLoading.collectAsState()
     var showExitDialog by remember { mutableStateOf(false) }
     var wasPaused by remember { mutableStateOf(false) }
+    val isNetworkAvailable by viewModel.isNetworkAvailable.collectAsState()
 
     BackHandler {
         // Quando viene premuto il tasto back, mostra il dialog
@@ -323,7 +382,7 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
-                        modifier = Modifier.width(120.dp), // Stessa larghezza del bottone Conferma
+                        modifier = Modifier.width(120.dp),
                         onClick = {
                             showExitDialog = false
                             if (!wasPaused) {
@@ -333,10 +392,10 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                     ) {
                         Text(stringResource(R.string.cancel))
                     }
-                    Spacer(modifier = Modifier.width(16.dp)) // Spazio tra i bottoni
+                    Spacer(modifier = Modifier.width(16.dp))
 
                     Button(
-                        modifier = Modifier.width(120.dp), // Larghezza fissa per entrambi i bottoni
+                        modifier = Modifier.width(120.dp),
                         onClick = {
                             viewModel.saveGame() // Salva la partita
                             navController.navigate("home") {
@@ -495,7 +554,8 @@ fun SudokuScreen(viewModel: SudokuViewModel = viewModel(), navController: NavCon
                     onNewGame = {
                         val currentDifficulty = gameState.difficulty.fromDifficultyResourceToString()
                         viewModel.generateNewGame(currentDifficulty) },
-                    windowSize = windowSize
+                    windowSize = windowSize,
+                    isNetworkAvailable = isNetworkAvailable
                 )
             }
         } else {
@@ -728,7 +788,7 @@ fun NumberKeyboard(
     windowSize: WindowWidthSizeClass
 ) {
     val buttonSize = when (windowSize) {
-        WindowWidthSizeClass.Compact -> 45.dp
+        WindowWidthSizeClass.Compact -> 40.dp
         WindowWidthSizeClass.Medium -> 60.dp
         WindowWidthSizeClass.Expanded -> 70.dp
         else -> 45.dp
@@ -802,7 +862,7 @@ fun NumberButton(
     ) {
         Text(
             text = number.toString(),
-            fontSize = (size.value * 0.36f).sp,
+            fontSize = (size.value * 0.5f).sp,
             fontWeight = FontWeight.Medium
         )
     }
@@ -819,7 +879,8 @@ fun BottomActionBar(
     onMenu: () -> Unit,
     isCompleted: Boolean = false,
     onNewGame: () -> Unit = {},
-    windowSize: WindowWidthSizeClass
+    windowSize: WindowWidthSizeClass,
+    isNetworkAvailable: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -866,7 +927,8 @@ fun BottomActionBar(
                 label = stringResource(R.string.new_sudoku_game),
                 onClick = onNewGame,
                 windowSize = windowSize,
-                isEndGameButton = true
+                isEndGameButton = true,
+                enabled = isNetworkAvailable
             )
             ActionButton(
                 iconRes = R.drawable.home,
@@ -907,12 +969,12 @@ fun ActionButton(
     }
 
     val backgroundColor = when {
-        !enabled ->  MaterialTheme.colorScheme.secondary
+        !enabled ->  MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
         isActive -> MaterialTheme.colorScheme.secondary
         else -> MaterialTheme.colorScheme.primary
     }
 
-    val textColor = Color.White
+    val textColor = if (enabled) Color.White else Color.White.copy(alpha = 0.3f)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

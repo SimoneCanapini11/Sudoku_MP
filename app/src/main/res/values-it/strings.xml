@@ -35,4 +35,5 @@
     <string name="loading_new_game">Generazione nuova partita…</string>
     <string name="difficulty_unknown">Sconosciuta</string>
     <string name="select_difficulty">Seleziona Difficoltà</string>
+    <string name="check_conn">Controlla la tua connessione internet</string>
 </resources>
