@@ -16,13 +16,13 @@ class SudokuRepository {
     private val hardGames = mutableListOf<SudokuGame>()
 
     // Numero di griglie da precaricare per ogni difficoltà
-    private val preloadSize = 1
+    private val preloadSize = 2
 
     // Funzione per precaricare le griglie
     suspend fun preloadGames() {
         try {
             coroutineScope {
-                repeat(5) {
+                repeat(25) {
                     launch {
                         val response = SudokuApiClient.service.getSudoku()
                         val apiGrid = response.newboard.grids.first()
@@ -51,9 +51,7 @@ class SudokuRepository {
         }
 
         if (games.isNotEmpty()) {
-            val game = games[0]
-            games.removeAt(0)
-            return game
+            return games.removeAt(0)
         }
 
         var attempts = 0
@@ -67,14 +65,18 @@ class SudokuRepository {
                 val game = apiGrid.toSudokuGame()
 
                 if (game.difficulty.fromDifficultyResourceToString() == difficulty.lowercase()) {
+                    coroutineScope {
+                        launch {
+                            preloadGames()
+                        }
+                    }
                     return game
-                } else {
+                }
                     when (game.difficulty.fromDifficultyResourceToString()) {
                         "easy" -> if (easyGames.size < preloadSize) easyGames.add(game)
                         "medium" -> if (mediumGames.size < preloadSize) mediumGames.add(game)
                         "hard" -> if (hardGames.size < preloadSize) hardGames.add(game)
                     }
-                }
             } catch (e: Exception) {
                 Log.e("SudokuRepository", "Error fetching game", e)
             }
