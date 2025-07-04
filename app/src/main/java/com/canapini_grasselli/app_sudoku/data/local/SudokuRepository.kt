@@ -16,13 +16,13 @@ class SudokuRepository {
     private val hardGames = mutableListOf<SudokuGame>()
 
     // Numero di griglie da precaricare per ogni difficoltà
-    private val preloadSize = 2
+    private val preloadSize = 1
 
     // Funzione per precaricare le griglie
     suspend fun preloadGames() {
         try {
             coroutineScope {
-                repeat(25) {
+                repeat(50) {
                     launch {
                         val response = SudokuApiClient.service.getSudoku()
                         val apiGrid = response.newboard.grids.first()
