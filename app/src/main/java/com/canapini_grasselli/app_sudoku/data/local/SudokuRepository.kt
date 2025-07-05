@@ -20,8 +20,8 @@ class SudokuRepository {
 
     private val preloadMutex = Mutex()
 
-    private val preloadSize = 3
-    private val batchSize = 10 // Numero di griglie per chiamata API
+    private val preloadSize = 2
+    private val batchSize = 20 // Numero di griglie per chiamata API
     private val maxPreloadAttempts = 3
 
     private var isPreloading = false
@@ -41,7 +41,6 @@ class SudokuRepository {
                 var attempts = 0
                 while (needsMoreGames() && attempts < maxPreloadAttempts) {
                     attempts++
-                    Log.d("SudokuRepository", "Preload attempt $attempts")
 
                     fetchAndCacheGames()
                     kotlinx.coroutines.delay(500)
@@ -167,7 +166,6 @@ class SudokuRepository {
             }
 
             if (games.isNotEmpty()) {
-                Log.d("SudokuRepository", "Cache filled while waiting for $difficulty")
                 return games.removeAt(0)
             }
         }
